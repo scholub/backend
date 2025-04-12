@@ -1,0 +1,10 @@
+[project]
+name = "scholub"
+version = "0.1.0"
+description = "Backend of scholub"
+readme = "README.md"
+requires-python = "==3.13.2"
+dependencies = [
+  "fastapi[standard]==0.115.12",
+  "gel==3.0.1",
+]
