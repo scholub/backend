@@ -23,7 +23,7 @@ async def get_papers(
 ) -> GetPapersResult | None:
     return await executor.query_single(
         """\
-        select Paper {
+        select Cache {
           paper_id,
           modified
         } filter .paper_id = <str>$paper_id;\

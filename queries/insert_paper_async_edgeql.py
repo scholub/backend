@@ -22,11 +22,11 @@ async def insert_paper(
 ) -> InsertPaperResult:
     return await executor.query_single(
         """\
-        insert Paper {
+        insert Cache {
           paper_id := <str>$paper_id,
           modified := <datetime>$modified
         } unless conflict on .paper_id else (
-          select (update Paper set {
+          select (update Cache set {
             modified := <datetime>$modified
           })
         );\

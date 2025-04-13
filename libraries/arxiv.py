@@ -21,7 +21,7 @@ async def download_arxiv(paper_id: str, force: bool = False) -> InsertPaperResul
     modified=paper.updated
   )
 
-async def refresh_paper(paper_id: str):
+async def refresh_cache(paper_id: str):
   paper_cached = await get_paper(db, paper_id=paper_id)
   paper = next(client.results(
     Search(id_list=[paper_id])
