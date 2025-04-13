@@ -1,0 +1,6 @@
+module default {
+  type Paper {
+    required paper_id: str {constraint exclusive;};
+    required modified: datetime;
+  }
+}
