@@ -18,15 +18,12 @@ class GetPapersResult:
 
 async def get_papers(
     executor: gel.AsyncIOExecutor,
-    *,
-    paper_id: str,
-) -> GetPapersResult | None:
-    return await executor.query_single(
+) -> list[GetPapersResult]:
+    return await executor.query(
         """\
         select Cache {
           paper_id,
           modified
-        } filter .paper_id = <str>$paper_id;\
+        };\
         """,
-        paper_id=paper_id,
     )
