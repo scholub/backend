@@ -382,8 +382,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fastapi", extras = ["standard"], specifier = ">=0.115.12" },
-    { name = "gel", specifier = ">=3.0.1" },
+    { name = "fastapi", extras = ["standard"], specifier = "==0.115.12" },
+    { name = "gel", specifier = "==3.0.1" },
 ]
 
 [[package]]
