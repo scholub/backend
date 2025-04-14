@@ -4,7 +4,7 @@ from queries.insert_paper_async_edgeql import insert_paper, InsertPaperResult
 from queries.get_paper_async_edgeql import get_paper, GetPaperResult
 from queries.get_papers_async_edgeql import get_papers
 
-from .initalizer import db, scheduler
+from .initalizer import db
 
 client = Client()
 
@@ -23,7 +23,6 @@ async def download_arxiv(paper_id: str, force: bool = False) -> InsertPaperResul
     modified=paper.updated
   )
 
-@scheduler.task("daily") # pyright: ignore[reportUnknownMemberType, reportUntypedFunctionDecorator]
 async def refresh_cache():
   papers = await get_papers(db)
   paper_ids = [i.paper_id for i in papers]

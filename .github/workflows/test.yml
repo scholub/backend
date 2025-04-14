@@ -1,0 +1,17 @@
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: geldata/setup-gel@v1
+      - uses: astral-sh/setup-uv@v5
+
+      - name: setup
+        run: |
+          gel project init --non-interactive
+          uv sync
+
+      - name: test
+        run: "uv run pytest ./tests"

@@ -5,10 +5,16 @@ description = "Backend of scholub"
 readme = "README.md"
 requires-python = "==3.13.2"
 dependencies = [
+  "apscheduler==3.11.0",
   "arxiv==2.2.0",
   "fastapi[standard]==0.115.12",
   "gel==3.0.1",
   "pydantic==2.11.3",
+  "pytest-asyncio==0.26.0",
   "python-dotenv==1.1.0",
-  "rocketry==2.5.1",
+]
+
+[dependency-groups]
+dev = [
+  "pytest==8.3.5",
 ]

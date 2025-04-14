@@ -12,6 +12,8 @@ import uuid
 @dataclasses.dataclass
 class InsertPaperResult:
     id: uuid.UUID
+    paper_id: str
+    modified: datetime.datetime
 
 
 async def insert_paper(
@@ -22,14 +24,14 @@ async def insert_paper(
 ) -> InsertPaperResult:
     return await executor.query_single(
         """\
-        insert Cache {
+        select (insert Cache {
           paper_id := <str>$paper_id,
           modified := <datetime>$modified
         } unless conflict on .paper_id else (
           select (update Cache set {
             modified := <datetime>$modified
           })
-        );\
+        )) {paper_id, modified};\
         """,
         paper_id=paper_id,
         modified=modified,
