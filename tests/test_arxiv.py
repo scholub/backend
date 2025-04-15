@@ -4,18 +4,24 @@ from queries.insert_paper_async_edgeql import insert_paper
 from queries.get_paper_async_edgeql import get_paper
 
 from arxiv import Client, Search # pyright: ignore[reportMissingTypeStubs]
-from pytest import mark
+from pytest import fixture
 
+from asyncio import get_event_loop_policy
 from hashlib import sha3_512
 from pathlib import Path
 from shutil import rmtree
+
+# @fixture(scope='session')
+# def event_loop():
+#   policy = get_event_loop_policy()
+#   loop = policy.new_event_loop()
+#   yield loop
+#   loop.close()
 
 client = Client()
 rmtree("./files", ignore_errors=True)
 Path("./files").mkdir()
 _ = next(client.results(Search(id_list=["2412.19437"]))).download_pdf("./files", "2412.19437_compare.pdf")
-
-pytestmark = mark.asyncio
 
 def get_hash(path: str) -> str:
   return sha3_512(Path(path).read_bytes()).hexdigest()
