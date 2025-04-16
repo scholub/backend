@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ]
+    },
+    {
+      "matchDepTypes": [
+        "devDependencies"
+      ]
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
+}

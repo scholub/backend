@@ -1,4 +1,8 @@
 module default {
+  type User {
+    required email: str {constraint exclusive;};
+    required password: str;
+  }
   type Cache {
     required paper_id: str {constraint exclusive;};
     required modified: datetime;
