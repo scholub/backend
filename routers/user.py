@@ -4,8 +4,6 @@ from uuid import UUID, uuid4
 from datetime import datetime
 from os import getenv
 
-from argon2.exceptions import VerifyMismatchError
-
 from libraries.initalizer import db, scheduler
 from libraries.email import send_email
 
@@ -14,7 +12,9 @@ from queries.insert_user_async_edgeql import insert_user
 from queries.update_hash_async_edgeql import update_hash
 
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from fastapi import APIRouter, HTTPException, Header, status
+from fastapi.responses import JSONResponse
 from pydantic import EmailStr
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -87,3 +87,4 @@ async def login(
       _ = update_hash(db, email=email, password=hasher.hash(password))
   except VerifyMismatchError:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
+  return JSONResponse({"session": str(issue_session(email, sessions))})
