@@ -4,9 +4,7 @@ from queries.insert_paper_async_edgeql import insert_paper
 from queries.get_paper_async_edgeql import get_paper
 
 from arxiv import Client, Search # pyright: ignore[reportMissingTypeStubs]
-from pytest import fixture
 
-from asyncio import get_event_loop_policy
 from hashlib import sha3_512
 from pathlib import Path
 from shutil import rmtree
