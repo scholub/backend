@@ -42,7 +42,7 @@ async def confirm(
 ):
   data = verify_jwt(token)
   if data is None:
-    raise HTTPException(status.HTTP_403_FORBIDDEN, "token expired or invalid")
+    raise HTTPException(status.HTTP_401_UNAUTHORIZED, "token expired or invalid")
   if len(password) < 8:
     raise HTTPException(
       status.HTTP_400_BAD_REQUEST,
