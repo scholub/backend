@@ -12,6 +12,7 @@ jobs:
 
       - name: setup
         run: |
+          echo "SECRET_KEY=test" > .env
           uv tool install gel
           $HOME/.local/bin/gel project init --non-interactive
           uv sync
