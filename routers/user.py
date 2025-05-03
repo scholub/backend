@@ -12,7 +12,6 @@ from queries.update_hash_async_edgeql import update_hash
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import APIRouter, HTTPException, Header, status
-from fastapi.responses import JSONResponse
 from pydantic import EmailStr
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -31,7 +30,10 @@ async def register(
     )
   send_email(
     "Verification request from Scholub",
-    f"{domain}/confirm?email={email}&jwt={register_jwt(Data(email=email))}",
+    f"{domain}/confirm?email={email}&jwt={register_jwt(Data(
+      email=email,
+      confirmed=False
+    ))}",
     [email]
   )
 
@@ -40,7 +42,7 @@ async def confirm(
   token: Annotated[str, Header(description="jwt token")],
   password: Annotated[str, Header(description="password of account")]
 ):
-  data = verify_jwt(token)
+  data = verify_jwt(token, False)
   if data is None:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "token expired or invalid")
   if len(password) < 8:
@@ -54,6 +56,10 @@ async def confirm(
       "email must be unique."
     )
   _ = await insert_user(db, email=data.email, password=hasher.hash(password))
+  return register_jwt(Data(
+    email=data.email,
+    confirmed=True
+  ))
 
 @router.post("/login")
 async def login(
@@ -69,4 +75,4 @@ async def login(
       _ = update_hash(db, email=email, password=hasher.hash(password))
   except VerifyMismatchError:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
-  return register_jwt(Data(email=email))
+  return register_jwt(Data(email=email, confirmed=True))
