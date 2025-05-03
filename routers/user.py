@@ -1,12 +1,10 @@
-from collections import defaultdict
 from typing import Annotated
-from uuid import UUID, uuid4
-from datetime import datetime
 from os import getenv
 
-from libraries.initalizer import db, scheduler
+from libraries.initalizer import db
 from libraries.email import send_email
 
+from libraries.jwt import Data, register_jwt, verify_jwt
 from queries.get_user_async_edgeql import get_user
 from queries.insert_user_async_edgeql import insert_user
 from queries.update_hash_async_edgeql import update_hash
@@ -20,20 +18,7 @@ from pydantic import EmailStr
 router = APIRouter(prefix="/user", tags=["user"])
 
 domain = getenv("ROOT_DOMAIN", "http://localhost:8080")
-
 hasher = PasswordHasher()
-sessions: defaultdict[str, set[UUID]] = defaultdict(lambda: set())
-emails: defaultdict[str, set[UUID]] = defaultdict(lambda: set())
-
-def issue_session(name: str, sessions: defaultdict[str, set[UUID]]) -> UUID:
-  session = uuid4()
-  sessions[name].add(session)
-  _ = scheduler.add_job( # pyright: ignore[reportUnknownMemberType]
-    lambda: sessions[name].remove(session) if len(sessions[name]) != 1 else sessions.__delitem__(name),
-    "date",
-    run_date=datetime.now().isoformat()
-  )
-  return session
 
 @router.post("/register")
 async def register(
@@ -46,32 +31,29 @@ async def register(
     )
   send_email(
     "Verification request from Scholub",
-    f"{domain}/confirm?email={email}&session={issue_session(email, emails)}",
+    f"{domain}/confirm?email={email}&jwt={register_jwt(Data(email=email))}",
     [email]
   )
 
 @router.post("/confirm")
 async def confirm(
-  email: Annotated[str, Header(description="email of account")],
-  password: Annotated[str, Header(description="password of account")],
-  session: Annotated[str, Header(description="session of email verification request")]
+  token: Annotated[str, Header(description="jwt token")],
+  password: Annotated[str, Header(description="password of account")]
 ):
+  data = verify_jwt(token)
+  if data is None:
+    raise HTTPException(status.HTTP_403_FORBIDDEN, "token expired or invalid")
   if len(password) < 8:
     raise HTTPException(
       status.HTTP_400_BAD_REQUEST,
       "password must be at least 8 characters"
     )
-  if (await get_user(db, email=email)) is not None:
+  if (await get_user(db, email=data.email)) is not None:
     raise HTTPException(
       status.HTTP_409_CONFLICT,
       "email must be unique."
     )
-  if session not in emails[email]:
-    raise HTTPException(
-      status.HTTP_400_BAD_REQUEST,
-      "link doesn't exist"
-    )
-  _ = await insert_user(db, email=email, password=hasher.hash(password))
+  _ = await insert_user(db, email=data.email, password=hasher.hash(password))
 
 @router.post("/login")
 async def login(
@@ -87,4 +69,4 @@ async def login(
       _ = update_hash(db, email=email, password=hasher.hash(password))
   except VerifyMismatchError:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
-  return JSONResponse({"session": str(issue_session(email, sessions))})
+  return register_jwt(Data(email=email))

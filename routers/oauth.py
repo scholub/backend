@@ -24,7 +24,6 @@ async def login(request: Request) -> Response:
   redirect_uri = request.url_for('auth')  # This creates the url for the /auth endpoint
   return await oauth.google.authorize_redirect(request, redirect_uri) # pyright: ignore[reportOptionalMemberAccess, reportUnknownMemberType, reportUnknownVariableType]
 
-
 @router.post('/auth')
 async def auth(request: Request) -> Response:
   try:
