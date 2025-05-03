@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from jwt import encode, decode
 
 from libraries.initalizer import SECRET_KEY
 
 class Data(BaseModel):
-  email: str
+  email: EmailStr
+  confirmed: bool
 
 def register_jwt(data: Data) -> str:
   _data = data.model_dump()
