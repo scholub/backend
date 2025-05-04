@@ -17,7 +17,7 @@ _ = oauth.register( # pyright: ignore[reportUnknownVariableType, reportUnknownMe
   client_kwargs={'scope': 'openid email profile'}
 )
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/oauth", tags=["oauth"])
 
 @router.post('/login')
 async def login(request: Request) -> Response:
