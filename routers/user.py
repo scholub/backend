@@ -11,7 +11,7 @@ from queries.update_hash_async_edgeql import update_hash
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import APIRouter, HTTPException, Header, status
+from fastapi import APIRouter, HTTPException, Body, status
 from pydantic import EmailStr
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -21,7 +21,7 @@ hasher = PasswordHasher()
 
 @router.post("/register")
 async def register(
-  email: Annotated[EmailStr, Header(description="email of account")]
+  email: Annotated[EmailStr, Body(description="email of account")]
 ):
   if (await get_user(db, email=email)) is not None:
     raise HTTPException(
@@ -39,8 +39,8 @@ async def register(
 
 @router.post("/confirm")
 async def confirm(
-  token: Annotated[str, Header(description="jwt token")],
-  password: Annotated[str, Header(description="password of account")]
+  token: Annotated[str, Body(description="jwt token")],
+  password: Annotated[str, Body(description="password of account")]
 ):
   data = verify_jwt(token, False)
   if data is None:
@@ -63,8 +63,8 @@ async def confirm(
 
 @router.post("/login")
 async def login(
-  email: Annotated[EmailStr, Header(description="email of account")],
-  password: Annotated[str, Header(description="password of account")]
+  email: Annotated[EmailStr, Body(description="email of account")],
+  password: Annotated[str, Body(description="password of account")]
 ):
   user = await get_user(db, email=email)
   if user is None:
