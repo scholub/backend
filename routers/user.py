@@ -5,6 +5,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import APIRouter, Body, HTTPException, status
 from pydantic import EmailStr
+from satellite_py import generate_error_responses
 
 from libraries.email import send_email
 from libraries.initalizer import db
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 domain = getenv("ROOT_DOMAIN", "http://localhost:8080")
 hasher = PasswordHasher()
 
-@router.post("/register")
+@router.post("/register", responses=generate_error_responses({409}))
 async def register(
   email: Annotated[EmailStr, Body(description="email of account")]
 ):
@@ -34,7 +35,7 @@ async def register(
     [email]
   )
 
-@router.post("/confirm")
+@router.post("/confirm", responses=generate_error_responses({401, 400, 409}))
 async def confirm(
   token: Annotated[str, Body(description="jwt token")],
   password: Annotated[str, Body(description="password of account")]
@@ -58,7 +59,7 @@ async def confirm(
     confirmed=True
   ))
 
-@router.post("/login")
+@router.post("/login", responses=generate_error_responses({401}))
 async def login(
   email: Annotated[EmailStr, Body(description="email of account")],
   password: Annotated[str, Body(description="password of account")]

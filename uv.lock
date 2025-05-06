@@ -629,6 +629,18 @@ wheels = [
 ]
 
 [[package]]
+name = "satellite-py"
+version = "0.1.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1b/78/c078a50660960f3ed49ff1f3753c7639e7bd13f8fc60457fd698ed8f6512/satellite_py-0.1.9.tar.gz", hash = "sha256:b24570a6e9490a869dcb25e50aae7c2aab0cc8df58048e11a01bcad79f465b24", size = 1328, upload-time = "2025-05-06T16:10:33.936Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/e4/d3f1ed624841289e922b30a4dfe7d1a50a34a2c6bcdacea044f04e3bbf33/satellite_py-0.1.9-py3-none-any.whl", hash = "sha256:f0337f4d7e053658380dfe56de9e9dd3622cef61c8443a4f63af401eb2a67580", size = 1865, upload-time = "2025-05-06T16:10:32.548Z" },
+]
+
+[[package]]
 name = "scholub"
 version = "0.1.0"
 source = { virtual = "." }
@@ -644,6 +656,7 @@ dependencies = [
     { name = "pyjwt" },
     { name = "pytest-asyncio" },
     { name = "python-dotenv" },
+    { name = "satellite-py" },
 ]
 
 [package.dev-dependencies]
@@ -664,6 +677,7 @@ requires-dist = [
     { name = "pyjwt", specifier = "==2.10.1" },
     { name = "pytest-asyncio", specifier = "==0.26.0" },
     { name = "python-dotenv", specifier = "==1.1.0" },
+    { name = "satellite-py", specifier = "==0.1.9" },
 ]
 
 [package.metadata.requires-dev]
