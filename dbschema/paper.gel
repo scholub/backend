@@ -8,6 +8,22 @@ module Paper {
     required name: str;
     required description: str;
     required category: str;
-    multi keywords: str;
+    required tag: str;
   }
+  type Post {
+    required title: str;
+    required body: str;
+    required tag: str;
+    required created: datetime {default := datetime_current()};
+    required modified: datetime {default := datetime_current()};
+    required like_count: int64 {default := 0};
+    required dislike_count: int64 {default := 0};
+    multi comments: Comment;
+  }
+  type Comment {
+    required user: default::User;
+    required created: datetime {default := datetime_current()};
+    required like_count: int64 {default := 0};
+    required dislike_count: int64 {default := 0};
+  };
 }

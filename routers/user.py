@@ -5,7 +5,7 @@ from libraries.initalizer import db
 from libraries.email import send_email
 
 from libraries.jwt import Data, register_jwt, verify_jwt
-from queries.user import get_user, insert_user, update_password
+from queries.user import get_user_by_email, insert_user, update_password
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -21,7 +21,7 @@ hasher = PasswordHasher()
 async def register(
   email: Annotated[EmailStr, Body(description="email of account")]
 ):
-  if (await get_user(db, email=email)) is not None:
+  if (await get_user_by_email(db, email=email)) is not None:
     raise HTTPException(
       status.HTTP_409_CONFLICT,
       "email must be unique."
@@ -48,7 +48,7 @@ async def confirm(
       status.HTTP_400_BAD_REQUEST,
       "password must be at least 8 characters"
     )
-  if (await get_user(db, email=data.email)) is not None:
+  if (await get_user_by_email(db, email=data.email)) is not None:
     raise HTTPException(
       status.HTTP_409_CONFLICT,
       "email must be unique."
@@ -64,7 +64,7 @@ async def login(
   email: Annotated[EmailStr, Body(description="email of account")],
   password: Annotated[str, Body(description="password of account")]
 ):
-  user = await get_user(db, email=email)
+  user = await get_user_by_email(db, email=email)
   if user is None:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
   try:
