@@ -5,9 +5,7 @@ from libraries.initalizer import db
 from libraries.email import send_email
 
 from libraries.jwt import Data, register_jwt, verify_jwt
-from queries.get_user_async_edgeql import get_user
-from queries.insert_user_async_edgeql import insert_user
-from queries.update_hash_async_edgeql import update_hash
+from queries.user import get_user, insert_user, update_password
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -72,7 +70,7 @@ async def login(
   try:
     _ = hasher.verify(user.password, password)
     if hasher.check_needs_rehash(user.password):
-      _ = update_hash(db, email=email, password=hasher.hash(password))
+      _ = update_password(db, email=email, password=hasher.hash(password))
   except VerifyMismatchError:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
   return register_jwt(Data(email=email, confirmed=True))

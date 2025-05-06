@@ -22,3 +22,10 @@ dependencies = [
 dev = [
   "pytest==8.3.5",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"queries/*" = ["F403"]
+
+[tool.basedpyright]
+exclude = ["queries/*"]
+

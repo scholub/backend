@@ -3,15 +3,4 @@ module default {
     required email: str {constraint exclusive;};
     required password: str;
   }
-  type Cache {
-    required paper_id: str {constraint exclusive;};
-    required modified: datetime;
-  }
-  type Paper {
-    required paper_id: str {constraint exclusive};
-    required name: str;
-    required description: str;
-    required category: str;
-    multi keywords: str;
-  }
 }
