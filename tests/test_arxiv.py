@@ -24,8 +24,8 @@ def get_hash(path: str) -> str:
   return sha3_512(Path(path).read_bytes()).hexdigest()
 
 async def init():
-  await db.execute("DELETE Paper;") # pyright: ignore[reportUnknownMemberType]
-  await db.execute("DELETE Cache;") # pyright: ignore[reportUnknownMemberType]
+  await db.execute("DELETE paper::Paper;") # pyright: ignore[reportUnknownMemberType]
+  await db.execute("DELETE paper::Cache;") # pyright: ignore[reportUnknownMemberType]
 
 class TestArxivCache:
   async def test_init(self):
