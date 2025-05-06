@@ -23,8 +23,11 @@ dev = [
   "pytest==8.3.5",
 ]
 
+[tool.ruff.lint]
+extend-select = ["I"]
+
 [tool.ruff.lint.per-file-ignores]
-"queries/*" = ["F403"]
+"queries/*" = ["F403", "I"]
 
 [tool.basedpyright]
 exclude = ["queries/*"]

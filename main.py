@@ -1,13 +1,12 @@
 from contextlib import asynccontextmanager
 
-from libraries.initalizer import scheduler
-from libraries.arxiv import refresh_cache
-
-from routers.oauth import router as oauth_router
-from routers.user import router as user_router
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from libraries.arxiv import refresh_cache
+from libraries.initalizer import scheduler
+from routers.oauth import router as oauth_router
+from routers.user import router as user_router
 
 app = FastAPI()
 app.add_middleware(

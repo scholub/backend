@@ -1,6 +1,12 @@
-from arxiv import Client, Search, SortCriterion # pyright: ignore[reportMissingTypeStubs]
+from arxiv import Client, Search  # pyright: ignore[reportMissingTypeStubs]
 
-from queries.paper import insert_cache, InsertCacheResult, get_cache, GetCacheResult, get_caches
+from queries.paper import (
+  GetCacheResult,
+  InsertCacheResult,
+  get_cache,
+  get_caches,
+  insert_cache,
+)
 
 from .initalizer import db
 

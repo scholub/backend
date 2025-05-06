@@ -1,16 +1,15 @@
-from typing import Annotated
 from os import getenv
-
-from libraries.initalizer import db
-from libraries.email import send_email
-
-from libraries.jwt import Data, register_jwt, verify_jwt
-from queries.user import get_user_by_email, insert_user, update_password
+from typing import Annotated
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import APIRouter, HTTPException, Body, status
+from fastapi import APIRouter, Body, HTTPException, status
 from pydantic import EmailStr
+
+from libraries.email import send_email
+from libraries.initalizer import db
+from libraries.jwt import Data, register_jwt, verify_jwt
+from queries.user import get_user_by_email, insert_user, update_password
 
 router = APIRouter(prefix="/user", tags=["user"])
 

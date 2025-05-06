@@ -1,7 +1,8 @@
-from os import getenv
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from os import getenv
+
 
 def send_email(title: str, body: str, receiver: list[str]):
   smtp_host = getenv("AWS_SES_SMTP_HOST", "email-smtp.eu-west-2.amazonaws.com")

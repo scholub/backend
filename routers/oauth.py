@@ -1,7 +1,10 @@
 from os import getenv
 
-from authlib.integrations.starlette_client import OAuth, OAuthError # pyright: ignore[reportMissingTypeStubs]
-from fastapi import Request, APIRouter, Response
+from authlib.integrations.starlette_client import (  # pyright: ignore[reportMissingTypeStubs]
+  OAuth,
+  OAuthError,
+)
+from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse
 from starlette.config import Config
 

@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from sys import modules
 
+from jwt import decode, encode
 from pydantic import BaseModel, EmailStr
-from jwt import encode, decode
 
 from libraries.initalizer import SECRET_KEY
+
 
 class Data(BaseModel):
   email: EmailStr
