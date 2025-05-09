@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from jwt import DecodeError
 from pytest import raises
 
-from libraries.jwt import Data, register_jwt, verify_jwt
+from libraries.auth import Data, register_jwt, verify_jwt
 from routers.user import confirm, login
 
 

@@ -2,12 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Run from Workspace Root",
+      "name": "Python: Module CmdVar",
       "type": "python",
       "request": "launch",
-      "program": "${file}",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "module": "${command:extension.commandvariable.file.relativeDirDots}.${fileBasenameNoExtension}"
     }
   ]
 }

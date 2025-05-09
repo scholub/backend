@@ -1,31 +1,30 @@
 from arxiv import Client, Search  # pyright: ignore[reportMissingTypeStubs]
 
+from .initalizer import db
 from queries.paper import (
-  GetCacheResult,
-  InsertCacheResult,
   get_cache,
   get_caches,
   insert_cache,
 )
 
-from .initalizer import db
+from pathlib import Path
 
 client = Client()
 
-async def download_arxiv(paper_id: str, force: bool = False) -> InsertCacheResult | GetCacheResult:
+async def download_arxiv(paper_id: str, force: bool = False) -> Path:
   paper = next(client.results(
     Search(id_list=[paper_id])
   ))
   if not force:
-    paper_cached = await get_cache(db, paper_id=paper_id)
-    if paper_cached:
-      return paper_cached
+    if await get_cache(db, paper_id=paper_id):
+      return Path("./files") / f"{paper_id}.pdf"
   _ = paper.download_pdf(dirpath="./files", filename=f"{paper_id}.pdf")
-  return await insert_cache(
+  _ = await insert_cache(
     db,
     paper_id=paper_id,
     modified=paper.updated
   )
+  return Path("./files") / f"{paper_id}.pdf"
 
 async def refresh_cache():
   papers = await get_caches(db)
