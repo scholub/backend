@@ -7,9 +7,9 @@ from fastapi import APIRouter, Body, HTTPException, status
 from pydantic import EmailStr
 from satellite_py import generate_error_responses
 
-from libraries.email import send_email
 from libraries.initalizer import db
 from libraries.jwt import Data, register_jwt, verify_jwt
+from libraries.mailer import send_email
 from queries.user import get_user_by_email, insert_user, update_password
 
 router = APIRouter(prefix="/user", tags=["user"])

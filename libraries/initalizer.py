@@ -1,7 +1,7 @@
 from os import getenv
 
-from apscheduler.schedulers.background import (
-  BackgroundScheduler,  # pyright: ignore[reportMissingTypeStubs]
+from apscheduler.schedulers.background import (  # pyright: ignore[reportMissingTypeStubs]
+  BackgroundScheduler,
 )
 from dotenv import load_dotenv
 from gel import create_async_client  # pyright: ignore[reportUnknownVariableType]
