@@ -1,0 +1,13 @@
+with
+  post := select Post filter .post_id = <uuid>$post_id limit 1,
+  user := select User filter .user_id = <uuid>$user_id limit 1,
+insert Reaction {
+  is_like := <bool>$is_like,
+  user := user,
+  post := post
+} unless conflict on ((.user, .post)) else (
+  update Reaction {}
+    is_like := <bool>$is_like
+  } filter .user = user and .post = post
+)
+# TODO: add like_count and dislike_count to post

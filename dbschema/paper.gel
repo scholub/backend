@@ -26,4 +26,10 @@ module Paper {
     required like_count: int64 {default := 0};
     required dislike_count: int64 {default := 0};
   };
+  type Reaction {
+    required is_like: bool;
+    required user: default::User;
+    required post: Post;
+    constraint exclusive on ((.user, .post));
+  }
 }
