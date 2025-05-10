@@ -1,4 +1,6 @@
 from hashlib import sha3_512
+from os import utime
+from os.path import getctime, getmtime
 from pathlib import Path
 from shutil import rmtree
 
@@ -6,7 +8,6 @@ from arxiv import Client, Search  # pyright: ignore[reportMissingTypeStubs]
 
 from libraries.initalizer import db
 from libraries.paper import download_arxiv, refresh_cache
-from queries.paper import get_cache, insert_cache
 
 # @fixture(scope='session')
 # def event_loop():
@@ -25,33 +26,28 @@ def get_hash(path: str) -> str:
 
 async def init():
   await db.execute("DELETE Paper::Paper;") # pyright: ignore[reportUnknownMemberType]
-  await db.execute("DELETE Paper::Cache;") # pyright: ignore[reportUnknownMemberType]
+  for i in Path("./files").glob("*"):
+    i.unlink()
 
 class TestArxivCache:
   async def test_init(self):
     await init()
 
-  async def test_download_non_cached_pdf(self):
-    assert await get_cache(db, paper_id="2412.19437") is None
+  async def test_download_arxiv(self):
+    assert not Path("./files/2412.19437.pdf").exists()
     _ = await download_arxiv("2412.19437")
-
-  async def test_download_cached_pdf(self):
-    assert await get_cache(db, paper_id="2412.19437") is not None
-    _ = await download_arxiv("2412.19437")
-    assert get_hash("./files/2412.19437.pdf") == get_hash("./files/2412.19437_compare.pdf")
-
 
 class TestArxivRefreshCache:
   async def test_refresh_cache(self):
     paper = next(client.results(Search(id_list=["2412.19437v1"])))
     _ = paper.download_pdf("./files", "2412.19437.pdf")
-    result = await insert_cache(db, paper_id="2412.19437", modified=paper.updated)
+    utime(Path("./files/2412.19437.pdf"), (0, 0))
     hash = get_hash("./files/2412.19437.pdf")
+    modified = getmtime("./files/2412.19437.pdf")
+    created = getctime("./files/2412.19437.pdf")
     await refresh_cache()
-    refreshed = await get_cache(db, paper_id="2412.19437")
-    if refreshed is None:
-      raise ValueError("Unreachable")
-    assert result.paper_id == refreshed.paper_id
-    assert result.modified < refreshed.modified
+    refreshed = Path("./files/2412.19437.pdf")
+    assert modified < getmtime(refreshed)
+    assert created < getctime(refreshed)
     assert hash != get_hash("./files/2412.19437.pdf")
 

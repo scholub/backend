@@ -1,9 +1,10 @@
-from .paper import download_arxiv
-from openai import OpenAI
-import os
-import PyPDF2
 import asyncio
+import os
 
+import PyPDF2
+from openai import OpenAI
+
+from .paper import download_arxiv
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

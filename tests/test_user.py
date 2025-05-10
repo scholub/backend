@@ -3,10 +3,14 @@ from jwt import DecodeError
 from pytest import raises
 
 from libraries.auth import Data, register_jwt, verify_jwt
+from libraries.initalizer import db
 from routers.user import confirm, login
 
 
 class TestInvalid:
+  async def test_init(self):
+    await db.execute("delete User;") # pyright: ignore[reportUnknownMemberType]
+
   async def test_invalid_login(self):
     with raises(HTTPException):
       _ = await login("invalid", "invalid")
