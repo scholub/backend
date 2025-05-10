@@ -1,13 +1,14 @@
+from pathlib import Path
+
 from arxiv import Client, Search  # pyright: ignore[reportMissingTypeStubs]
 
-from .initalizer import db
 from queries.paper import (
   get_cache,
   get_caches,
   insert_cache,
 )
 
-from pathlib import Path
+from .initalizer import db
 
 client = Client()
 
