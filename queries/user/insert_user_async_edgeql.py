@@ -16,16 +16,19 @@ class InsertUserResult:
 async def insert_user(
     executor: gel.AsyncIOExecutor,
     *,
+    name: str,
     email: str,
     password: str,
 ) -> InsertUserResult:
     return await executor.query_single(
         """\
         insert User {
+          name := <str>$name,
           email := <str>$email,
           password := <str>$password
         };\
         """,
+        name=name,
         email=email,
         password=password,
     )

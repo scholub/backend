@@ -5,6 +5,5 @@ select Paper::Post {
   created,
   modified,
   like_count,
-  dislike_count,
-  comments
+  dislike_count
 } filter .id = <uuid>$id;

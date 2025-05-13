@@ -19,12 +19,6 @@ class GetPostResult:
     modified: datetime.datetime
     like_count: int
     dislike_count: int
-    comments: list[GetPostResultCommentsItem]
-
-
-@dataclasses.dataclass
-class GetPostResultCommentsItem:
-    id: uuid.UUID
 
 
 async def get_post(
@@ -41,8 +35,7 @@ async def get_post(
           created,
           modified,
           like_count,
-          dislike_count,
-          comments
+          dislike_count
         } filter .id = <uuid>$id;\
         """,
         id=id,

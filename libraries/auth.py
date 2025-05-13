@@ -8,6 +8,7 @@ from libraries.initalizer import SECRET_KEY
 
 
 class Data(BaseModel):
+  name: str
   email: EmailStr
   confirmed: bool
 
@@ -23,7 +24,7 @@ def verify_jwt(token: str, require_confirm: bool = False) -> Data | None:
       SECRET_KEY,
       ["HS512"],
       options={"verify_signature": True, "verify_exp": True, "require": [
-        "exp", "email", "confirmed"
+        "exp", "email", "name", "confirmed"
       ]},
     )
     data = Data.model_validate(_data)

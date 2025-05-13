@@ -17,8 +17,7 @@ from libraries.paper import download_arxiv, refresh_cache
 #   loop.close()
 
 client = Client()
-rmtree("./files", ignore_errors=True)
-Path("./files").mkdir()
+rmtree("./files/cache", ignore_errors=True)
 _ = next(client.results(Search(id_list=["2412.19437"]))).download_pdf("./files", "2412.19437_compare.pdf")
 
 def get_hash(path: str) -> str:
