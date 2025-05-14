@@ -10,7 +10,12 @@ from satellite_py import generate_error_responses
 from libraries.auth import Data, register_jwt, verify_jwt
 from libraries.initalizer import db
 from libraries.mailer import send_email
-from queries.user import get_user_by_email, get_user_by_name, insert_user, update_password
+from queries.user import (
+  get_user_by_email,
+  get_user_by_name,
+  insert_user,
+  update_password,
+)
 
 router = APIRouter(prefix="/user", tags=["user"])
 

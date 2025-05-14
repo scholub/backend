@@ -7,8 +7,8 @@ from pathlib import Path
 import PyPDF2
 from openai import OpenAI
 
-from .paper import download_arxiv
 from .initalizer import get_data_path
+from .paper import download_arxiv
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

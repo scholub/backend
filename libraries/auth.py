@@ -17,7 +17,7 @@ def register_jwt(data: Data) -> str:
   _data["exp"] = int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp())
   return encode(_data, SECRET_KEY, "HS512")
 
-def verify_jwt(token: str, require_confirm: bool = False) -> Data | None:
+def verify_jwt(token: str, require_confirm: bool = True) -> Data | None:
   try:
     _data: dict[str, str | int] = decode( # pyright: ignore[reportAny]
       token,
