@@ -1,19 +1,18 @@
 import asyncio
+import base64
+import json
 import os
 from pathlib import Path
-import json
-import base64
-
 
 import PyPDF2
 from openai import OpenAI
 
 from .paper import download_arxiv
+from .initalizer import get_data_path
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def generate_post(paper_id: str):
-    Path(f"./files/post/{paper_id}").mkdir(parents=True, exist_ok=True)
     paper_path = await download_arxiv(paper_id)
     prompt = Path("./prompts/post.txt").read_text()
     
@@ -45,12 +44,12 @@ async def generate_post(paper_id: str):
 
         image_base64 = result.data[0].b64_json
         image_bytes = base64.b64decode(image_base64)
-        with open(f"./files/post/{paper_id}/{i["id"]}.png", "wb") as f:
-            f.write(image_bytes)
+        _ = (get_data_path("post") / f"{paper_id}/{i['id'].png}").write_bytes(image_bytes)
 
     
-    with open(f"./files/post/{paper_id}/post.json", "w", encoding="utf-8") as f:
-        json.dump(post_dict, f,ensure_ascii=False, indent=4)
+    _ = (get_data_path("post") / f"{paper_id}/post.json").write_text(
+      json.dumps(post_dict, ensure_ascii=False, indent=4
+    ))
 
     return post_dict
 

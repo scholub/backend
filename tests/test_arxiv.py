@@ -6,7 +6,7 @@ from shutil import rmtree
 
 from arxiv import Client, Search  # pyright: ignore[reportMissingTypeStubs]
 
-from libraries.initalizer import db
+from libraries.initalizer import db, get_data_path
 from libraries.paper import download_arxiv, refresh_cache
 
 # @fixture(scope='session')
@@ -18,15 +18,20 @@ from libraries.paper import download_arxiv, refresh_cache
 
 client = Client()
 
-rmtree("./files/cache", ignore_errors=True)
-_ = next(client.results(Search(id_list=["2412.19437"]))).download_pdf("./files", "2412.19437_compare.pdf")
+rmtree(get_data_path("cache"), ignore_errors=True)
+_ = next(
+  client.results(Search(id_list=["2412.19437"]))
+).download_pdf(
+  get_data_path("cache").as_posix(),
+  "2412.19437_compare.pdf"
+)
 
-def get_hash(path: str) -> str:
-  return sha3_512(Path(path).read_bytes()).hexdigest()
+def get_hash(path: Path) -> str:
+  return sha3_512(path.read_bytes()).hexdigest()
 
 async def init():
   await db.execute("DELETE Paper::Paper;") # pyright: ignore[reportUnknownMemberType]
-  for i in Path("./files").glob("*"):
+  for i in get_data_path("cache").glob("*"):
     i.unlink()
 
 class TestArxivCache:
@@ -34,20 +39,21 @@ class TestArxivCache:
     await init()
 
   async def test_download_arxiv(self):
-    assert not Path("./files/2412.19437.pdf").exists()
+    assert not (get_data_path("cache") / "2412.19437.pdf").exists()
     _ = await download_arxiv("2412.19437")
 
 class TestArxivRefreshCache:
   async def test_refresh_cache(self):
     paper = next(client.results(Search(id_list=["2412.19437v1"])))
-    _ = paper.download_pdf("./files", "2412.19437.pdf")
-    utime(Path("./files/2412.19437.pdf"), (0, 0))
-    hash = get_hash("./files/2412.19437.pdf")
-    modified = getmtime("./files/2412.19437.pdf")
-    created = getctime("./files/2412.19437.pdf")
+    _ = paper.download_pdf(get_data_path("cache").as_posix(), "2412.19437.pdf")
+    file_path = get_data_path("cache") / "2412.19437.pdf"
+    utime(file_path, (0, 0))
+    hash = get_hash(file_path)
+    modified = getmtime(file_path)
+    created = getctime(file_path)
     await refresh_cache()
-    refreshed = Path("./files/2412.19437.pdf")
+    refreshed = Path(file_path)
     assert modified < getmtime(refreshed)
     assert created < getctime(refreshed)
-    assert hash != get_hash("./files/2412.19437.pdf")
+    assert hash != get_hash(file_path)
 

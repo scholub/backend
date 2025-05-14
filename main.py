@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,9 +7,6 @@ from libraries.initalizer import scheduler
 from libraries.paper import refresh_cache
 from routers.oauth import router as oauth_router
 from routers.user import router as user_router
-
-Path("./files/cache").mkdir(parents=True, exist_ok=True)
-Path("./files/post").mkdir(parents=True, exist_ok=True)
 
 app = FastAPI()
 app.add_middleware(
