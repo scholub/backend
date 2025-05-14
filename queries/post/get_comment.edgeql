@@ -1,6 +1,8 @@
-select Paper::Comment {
-  user,
-  created,
-  like_count,
-  dislike_count
-} filter .id = <uuid>$id;
+select Paper::Post {
+  comments: {
+    created,
+    dislike_count,
+    like_count,
+    user: { id, name, email }
+  }
+} filter .id = <uuid>$post_id;

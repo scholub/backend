@@ -12,30 +12,40 @@ import uuid
 @dataclasses.dataclass
 class GetCommentResult:
     id: uuid.UUID
-    user: GetCommentResultUser
-    created: datetime.datetime
-    like_count: int
-    dislike_count: int
+    comments: list[GetCommentResultCommentsItem]
 
 
 @dataclasses.dataclass
-class GetCommentResultUser:
+class GetCommentResultCommentsItem:
     id: uuid.UUID
+    created: datetime.datetime
+    dislike_count: int
+    like_count: int
+    user: GetCommentResultCommentsItemUser
+
+
+@dataclasses.dataclass
+class GetCommentResultCommentsItemUser:
+    id: uuid.UUID
+    name: str
+    email: str
 
 
 async def get_comment(
     executor: gel.AsyncIOExecutor,
     *,
-    id: uuid.UUID,
+    post_id: uuid.UUID,
 ) -> GetCommentResult | None:
     return await executor.query_single(
         """\
-        select Paper::Comment {
-          user,
-          created,
-          like_count,
-          dislike_count
-        } filter .id = <uuid>$id;\
+        select Paper::Post {
+          comments: {
+            created,
+            dislike_count,
+            like_count,
+            user: { id, name, email }
+          }
+        } filter .id = <uuid>$post_id;\
         """,
-        id=id,
+        post_id=post_id,
     )

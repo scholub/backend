@@ -23,6 +23,7 @@ class TestInvalid:
     with raises(HTTPException):
       _ = await confirm(register_jwt(
         Data(
+          name="test",
           email="test@example.com",
           confirmed=False
         )
@@ -33,6 +34,7 @@ class TestValidAndPartiallyValid:
   async def test_confirm(self):
     data = verify_jwt(await confirm(
       register_jwt(Data(
+        name="test",
         email="test@example.com",
         confirmed=False
       )),
@@ -44,6 +46,25 @@ class TestValidAndPartiallyValid:
     with raises(HTTPException):
       _ = await confirm(
         register_jwt(Data(
+          name="test",
+          email="test@example.com",
+          confirmed=False
+        )),
+        "12345678"
+      )
+    with raises(HTTPException):
+      _ = await confirm(
+        register_jwt(Data(
+          name="test",
+          email="test2@example.com",
+          confirmed=False
+        )),
+        "12345678"
+      )
+    with raises(HTTPException):
+      _ = await confirm(
+        register_jwt(Data(
+          name="test2",
           email="test@example.com",
           confirmed=False
         )),

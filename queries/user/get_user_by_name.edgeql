@@ -1,4 +1,4 @@
 select User {
   name, email, password
-} filter .email = <str>$email limit 1;
+} filter .name = <str>$name limit 1;
 
