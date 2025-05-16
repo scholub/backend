@@ -21,6 +21,7 @@ class GetCommentResultCommentsItem:
     created: datetime.datetime
     dislike_count: int
     like_count: int
+    content: str
     user: GetCommentResultCommentsItemUser
 
 
@@ -43,6 +44,7 @@ async def get_comment(
             created,
             dislike_count,
             like_count,
+            content,
             user: { id, name, email }
           }
         } filter .id = <uuid>$post_id;\

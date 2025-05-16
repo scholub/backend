@@ -19,6 +19,7 @@ module Paper {
   type Comment {
     required user: default::User;
     required created: datetime {default := datetime_current()};
+    required content: str;
     required like_count: int64 {default := 0};
     required dislike_count: int64 {default := 0};
   };
