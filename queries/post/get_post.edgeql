@@ -1,9 +1,11 @@
 select Paper::Post {
   title,
-  body,
+  description,
+  paper_id,
+  category,
   tag,
   created,
   modified,
   like_count,
   dislike_count
-} filter .id = <uuid>$id;
+} filter .paper_id = <str>$paper_id;

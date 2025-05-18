@@ -1,14 +1,9 @@
 module Paper {
-  type Paper {
+  type Post {
     required paper_id: str {constraint exclusive};
-    required name: str;
+    required title: str;
     required description: str;
     required category: str;
-    required tag: str;
-  }
-  type Post {
-    required title: str;
-    required body: str;
     required tag: str;
     required created: datetime {default := datetime_current()};
     required modified: datetime {default := datetime_current()};

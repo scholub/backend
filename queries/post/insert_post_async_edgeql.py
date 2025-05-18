@@ -17,18 +17,24 @@ async def insert_post(
     executor: gel.AsyncIOExecutor,
     *,
     title: str,
-    body: str,
+    description: str,
+    paper_id: str,
+    category: str,
     tag: str,
 ) -> InsertPostResult:
     return await executor.query_single(
         """\
         insert Paper::Post {
           title := <str>$title,
-          body := <str>$body,
+          description := <str>$description,
+          paper_id := <str>$paper_id,
+          category := <str>$category,
           tag := <str>$tag
         };\
         """,
         title=title,
-        body=body,
+        description=description,
+        paper_id=paper_id,
+        category=category,
         tag=tag,
     )

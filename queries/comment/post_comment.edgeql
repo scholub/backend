@@ -1,5 +1,5 @@
 update Paper::Post
-filter .id = <uuid>$post_id
+filter .paper_id = <str>$paper_id
 set {
   comments += (
     insert Comment::Comment {

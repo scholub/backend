@@ -30,7 +30,6 @@ def get_hash(path: Path) -> str:
   return sha3_512(path.read_bytes()).hexdigest()
 
 async def init():
-  await db.execute("DELETE Paper::Paper;") # pyright: ignore[reportUnknownMemberType]
   for i in get_data_path("cache").glob("*"):
     i.unlink()
 

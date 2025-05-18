@@ -35,7 +35,7 @@ class GetCommentResultCommentsItemUser:
 async def get_comment(
     executor: gel.AsyncIOExecutor,
     *,
-    post_id: uuid.UUID,
+    paper_id: str,
 ) -> GetCommentResult | None:
     return await executor.query_single(
         """\
@@ -48,7 +48,7 @@ async def get_comment(
             content,
             user: { id, name, email }
           }
-        } filter .id = <uuid>$post_id;\
+        } filter .paper_id = <str>$paper_id;\
         """,
-        post_id=post_id,
+        paper_id=paper_id,
     )

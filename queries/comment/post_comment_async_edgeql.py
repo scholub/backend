@@ -18,12 +18,12 @@ async def post_comment(
     *,
     content: str,
     user_id: uuid.UUID,
-    post_id: uuid.UUID,
+    paper_id: str,
 ) -> PostCommentResult | None:
     return await executor.query_single(
         """\
         update Paper::Post
-        filter .id = <uuid>$post_id
+        filter .paper_id = <str>$paper_id
         set {
           comments += (
             insert Comment::Comment {
@@ -36,5 +36,5 @@ async def post_comment(
         """,
         content=content,
         user_id=user_id,
-        post_id=post_id,
+        paper_id=paper_id,
     )

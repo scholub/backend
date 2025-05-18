@@ -69,9 +69,9 @@ async def generate_post(paper_id: str):
     image_bytes = base64.b64decode(image_base64)
     _ = (get_data_path("post") / f"{paper_id}/{i.id}.png").write_bytes(image_bytes)
     completion.content = completion.content.replace(
-        i.id,
-        (get_data_path("post").relative_to(os.getcwd()) / f"{paper_id}/{i.id}.png").as_uri()
-      )
+      i.id,
+      (get_data_path("post").relative_to(os.getcwd()) / f"{paper_id}/{i.id}.png").as_uri()
+    )
 
   _ = (get_data_path("post") / f"{paper_id}/post.md").write_text(
     json.dumps(completion.content, ensure_ascii=False, indent=4
