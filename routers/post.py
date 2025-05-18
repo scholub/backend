@@ -1,29 +1,17 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Cookie, Depends, HTTPException, status
+from fastapi import APIRouter, Body, HTTPException, status
 from satellite_py import generate_error_responses
 
-from libraries.auth import verify_jwt
+from libraries.auth import cookieDep
 from libraries.initalizer import db
+from queries.comment import post_comment
+from queries.post import delete_reaction, reaction
 from queries.post import get_comment as db_get_comment
 from queries.post import get_post as db_get_post
-from queries.post import post_comment, reaction
-from queries.user import GetUserByEmailResult, get_user_by_email
 
 router = APIRouter(prefix="/post", tags=["post"])
-
-async def login_dep(auth: Annotated[str | None, Cookie()] = None):
-  if auth is None:
-    raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-  data = verify_jwt(auth)
-  if data is None:
-    raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-  user = await get_user_by_email(db, email=data.email)
-  if user is None:
-    raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-  return user
-cookieDep = Annotated[GetUserByEmailResult, Depends(login_dep)]
 
 @router.get("/{post_id}", responses=generate_error_responses({404}))
 async def get_post(post_id: UUID):

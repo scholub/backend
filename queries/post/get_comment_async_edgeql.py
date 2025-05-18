@@ -41,6 +41,7 @@ async def get_comment(
         """\
         select Paper::Post {
           comments: {
+            id,
             created,
             dislike_count,
             like_count,
