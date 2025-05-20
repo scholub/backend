@@ -1,16 +1,22 @@
 from typing import final
 
 from fastapi import HTTPException
+from gel import AsyncIOExecutor
 from pytest import raises
 
 from libraries.auth import Data, login_dep, register_jwt, verify_jwt
 from libraries.initalizer import db
 from queries.post import insert_post
-from queries.tests import get_reaction
+from queries.tests import get_reaction as db_get_reaction
 from queries.user import GetUserByEmailResult
 from routers.post import get_post, reaction_post
 from routers.user import confirm
 
+
+async def get_reaction(db: AsyncIOExecutor, paper_id: str):
+  react = await db_get_reaction(db, paper_id=paper_id)
+  assert react is not None
+  return react
 
 async def query(command: str):
   return await db.execute(command) # pyright: ignore[reportUnknownMemberType]
@@ -105,9 +111,7 @@ class TestReaction:
       like=False,
       user=self.user
     )
-    react = await get_reaction(db, paper_id="A")
-    assert react is not None
-    assert react.dislike_count == 1
+    assert (await get_reaction(db, paper_id="A")).dislike_count == 1
     with raises(HTTPException):
       await reaction_post(
         paper_id="B",
@@ -120,6 +124,23 @@ class TestReaction:
       user=self.user
     )
     react = await get_reaction(db, paper_id="A")
-    assert react is not None
     assert react.like_count == 1
     assert react.dislike_count == 0
+
+  async def TestDuplicatedReaction(self):
+    await reaction_post(
+      paper_id="A",
+      like=True,
+      user=self.user
+    )
+    react = await get_reaction(db, paper_id="A")
+    assert react.like_count == 1
+    assert react.dislike_count == 0
+
+  async def TestReactionMultiple(self):
+    await reaction_post(paper_id="A", like=True, user=self.user2)
+    assert (await get_reaction(db, paper_id="A")).like_count == 2
+    await reaction_post(paper_id="A", like=False, user=self.user)
+    react = await get_reaction(db, paper_id="A")
+    assert react.dislike_count == 1
+    assert react.like_count == 1
