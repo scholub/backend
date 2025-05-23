@@ -5,7 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from libraries.initalizer import scheduler
 from libraries.paper import refresh_cache
+from routers.comment import router as comment_router
 from routers.oauth import router as oauth_router
+from routers.post import router as post_router
 from routers.user import router as user_router
 
 app = FastAPI()
@@ -18,6 +20,8 @@ app.add_middleware(
 )
 app.include_router(oauth_router)
 app.include_router(user_router)
+app.include_router(post_router)
+app.include_router(comment_router)
 
 @asynccontextmanager
 async def on_start():
