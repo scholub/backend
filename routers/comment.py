@@ -6,7 +6,7 @@ from satellite_py import generate_error_responses
 
 from libraries.auth import cookieDep
 from libraries.initalizer import db
-from queries.comment import delete_reaction, reaction
+from queries.comment import delete_comment, delete_reaction, get_comment, reaction
 
 router = APIRouter(prefix="/comment", tags=["post", "comment"])
 
@@ -28,6 +28,18 @@ async def reaction_delete(
   resp = await delete_reaction(db, user_id=user.id, comment_id=comment_id)
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+@router.delete("/{comment_id}", responses=generate_error_responses({401, 403, 404}))
+async def delete(
+  comment_id: UUID,
+  user: cookieDep
+):
+  comment = await get_comment(db, id=comment_id)
+  if comment is None:
+    raise HTTPException(status.HTTP_404_NOT_FOUND)
+  if comment.user.id != user.id:
+    raise HTTPException(status.HTTP_403_FORBIDDEN)
+  _ = await delete_comment(db, id=comment_id)
 
 # @router.post("/{comment_id}/comment", responses=generate_error_responses({401, 404}))
 # async def comment(
