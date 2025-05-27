@@ -1,6 +1,7 @@
 from datetime import datetime
 from os.path import getmtime
 from pathlib import Path
+from typing import AsyncGenerator
 
 from arxiv import (  # pyright: ignore[reportMissingTypeStubs]
   Client,
@@ -15,7 +16,7 @@ from libraries.initalizer import (
 client = Client()
 slow_client = Client(page_size=1000, num_retries=5, delay_seconds=10)
 
-async def download_recent_posts():
+async def get_recent_posts() -> AsyncGenerator[Path, None]:
   result_generator = slow_client.results(
     Search(
       query = "cat:cs.AI",
@@ -25,7 +26,7 @@ async def download_recent_posts():
   result = next(result_generator)
   now = datetime.now().date()
   while result.published < now:
-    yield download_arxiv(result.entry_id)
+    yield result.entry_id
     result = next(result_generator)
 
 async def download_arxiv(paper_id: str, force: bool = False) -> Path:
