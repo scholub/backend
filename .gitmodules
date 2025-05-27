@@ -1,3 +1,3 @@
-[submodule "libraries/paper-reviewer"]
-	path = libraries/paper-reviewer
+[submodule "libraries/paper_reviewer"]
+	path = libraries/paper_reviewer
 	url = https://github.com/scholub/paper-reviewer.git
