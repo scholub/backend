@@ -6,14 +6,14 @@ from satellite_py import generate_error_responses
 from libraries.auth import cookieDep
 from libraries.initalizer import db
 from queries.comment import post_comment
-from queries.post import delete_reaction, reaction
+from queries.post import GetCommentResult, GetPostResult, delete_reaction, reaction
 from queries.post import get_comment as db_get_comment
 from queries.post import get_post as db_get_post
 
 router = APIRouter(prefix="/post", tags=["post"])
 
 @router.get("/{paper_id}", responses=generate_error_responses({404}))
-async def get_post(paper_id: str):
+async def get_post(paper_id: str) -> GetPostResult:
   resp = await db_get_post(db, paper_id=paper_id)
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
@@ -39,7 +39,7 @@ async def reaction_delete(
     raise HTTPException(status.HTTP_404_NOT_FOUND)
 
 @router.get("/{paper_id}/comment", responses=generate_error_responses({404}))
-async def get_comment(paper_id: str):
+async def get_comment(paper_id: str) -> GetCommentResult:
   resp = await db_get_comment(db, paper_id=paper_id)
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
