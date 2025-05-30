@@ -9,10 +9,8 @@ from openai import OpenAI
 from pydantic import BaseModel
 
 from .initalizer import get_data_path
-from .paper import download_arxiv
-from .paper_reviewer import Reviewer
-from .paper import get_recent_posts
-
+from .paper import download_arxiv, get_recent_posts
+from .paper_reviewer.reviewer import Reviewer
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -84,17 +82,18 @@ async def generate_post(paper_id: str):
 
 
 async def refresh_paper():
-    async for paper_id in get_recent_posts():
-
-        paper_path = await download_arxiv(paper_id)
-        paper_content = PyPDF2.PdfReader(paper_path.read_bytes())
-        
-        r = Reviewer(model="o4-mini")
-        r.review(paper_content, reflection=2)
-        r.review_ensembling()
-        if r.is_review_strong_enough():
-          await generate_post(paper_id=paper_id)
-            
+  async for paper_id in get_recent_posts():
+    paper_path = await download_arxiv(paper_id)
+    paper_content = PyPDF2.PdfReader(paper_path)
+    result = ""
+    for i in paper_content.pages:
+      result += f"{i.extract_text()}\n"
+    
+    r = Reviewer(model="o4-mini")
+    _ = await r.review(result, reflection=2) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+    _ = await r.review_ensembling() # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+    if r.is_review_strong_enough():
+      _ = await generate_post(paper_id=paper_id)
 
 if __name__ == "__main__":
   print(asyncio.run(generate_post("2501.12948")))

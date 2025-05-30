@@ -16,7 +16,7 @@ from libraries.initalizer import (
 client = Client()
 slow_client = Client(page_size=1000, num_retries=5, delay_seconds=10)
 
-async def get_recent_posts() -> AsyncGenerator[Path, None]:
+async def get_recent_posts() -> AsyncGenerator[str, None]:
   result_generator = slow_client.results(
     Search(
       query = "cat:cs.AI",
