@@ -1,6 +1,5 @@
 import asyncio
 import base64
-import json
 import os
 from pathlib import Path
 
@@ -8,7 +7,8 @@ import PyPDF2
 from openai import OpenAI
 from pydantic import BaseModel
 
-from .initalizer import get_data_path
+from ..queries.post import insert_post
+from .initalizer import db, get_data_path
 from .paper import download_arxiv, get_recent_posts
 from .paper_reviewer.reviewer import Reviewer
 
@@ -75,6 +75,14 @@ async def generate_post(paper_id: str):
     )
 
   _ = (get_data_path("post") / f"{paper_id}/post.md").write_text(completion.content)
+  _ = await insert_post(
+    db,
+    title=completion.title,
+    description=completion.summary,
+    paper_id=paper_id,
+    category="",
+    tag=""
+  )
 
   return completion.content
 
