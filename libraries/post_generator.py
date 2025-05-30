@@ -74,9 +74,7 @@ async def generate_post(paper_id: str):
       (get_data_path("post").relative_to(os.getcwd()) / f"{paper_id}/{i.id}.png").as_uri()
     )
 
-  _ = (get_data_path("post") / f"{paper_id}/post.md").write_text(
-    json.dumps(completion.content, ensure_ascii=False, indent=4
-  ))
+  _ = (get_data_path("post") / f"{paper_id}/post.md").write_text(completion.content)
 
   return completion.content
 
