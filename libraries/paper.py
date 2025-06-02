@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from os.path import getmtime
 from pathlib import Path
 
@@ -42,7 +42,7 @@ async def download_arxiv(paper_id: str, force: bool = False) -> Path:
 async def refresh_cache():
   print("starting refresh of arxiv cache")
   yesterday = datetime.now() - timedelta(days=1)
-  yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+  yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=UTC)
   papers = list(get_data_path("cache").glob("*.pdf"))
   for paper_cached in papers:
     if yesterday.timestamp() > getmtime(paper_cached):
