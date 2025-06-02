@@ -1,6 +1,5 @@
 from hashlib import sha3_512
 from os import utime
-from os.path import getctime, getmtime
 from pathlib import Path
 from shutil import rmtree
 
@@ -47,12 +46,6 @@ class TestArxivRefreshCache:
     _ = paper.download_pdf(get_data_path("cache").as_posix(), "2412.19437.pdf")
     file_path = get_data_path("cache") / "2412.19437.pdf"
     utime(file_path, (0, 0))
-    hash = get_hash(file_path)
-    modified = getmtime(file_path)
-    created = getctime(file_path)
     await refresh_cache()
-    refreshed = Path(file_path)
-    assert modified < getmtime(refreshed)
-    assert created < getctime(refreshed)
-    assert hash != get_hash(file_path)
+    assert not file_path.exists()
 
