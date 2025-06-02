@@ -7,8 +7,9 @@ import PyPDF2
 from openai import OpenAI
 from pydantic import BaseModel
 
-from ..queries.post import insert_post
-from ..queries.cache import get_cache, insert_cache, gc_cache
+from queries.cache import get_cache, insert_cache
+from queries.post import insert_post
+
 from .initalizer import db, get_data_path
 from .paper import download_arxiv, get_recent_posts
 from .paper_reviewer.reviewer import Reviewer
