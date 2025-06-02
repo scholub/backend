@@ -11,7 +11,15 @@ from routers.oauth import router as oauth_router
 from routers.post import router as post_router
 from routers.user import router as user_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def on_start(app: FastAPI): # pyright: ignore[reportUnusedParameter]
+  _ = scheduler.add_job(refresh_cache, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
+  _ = scheduler.add_job(refresh_paper, 'interval', hours=6) # pyright: ignore[reportUnknownMemberType]
+  yield
+  scheduler.shutdown() # pyright: ignore[reportUnknownMemberType]
+
+app = FastAPI(lifespan=on_start)
 app.add_middleware(
   CORSMiddleware,
   allow_origins=["http://localhost:5173"],
@@ -24,10 +32,4 @@ app.include_router(user_router)
 app.include_router(post_router)
 app.include_router(comment_router)
 
-@asynccontextmanager
-async def on_start():
-  _ = scheduler.add_job(refresh_cache, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
-  _ = scheduler.add_job(refresh_paper, 'interval', hours=6) # pyright: ignore[reportUnknownMemberType]
-  yield
-  scheduler.shutdown() # pyright: ignore[reportUnknownMemberType]
 
