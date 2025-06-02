@@ -1,11 +1,13 @@
 module Paper {
-  type Post {
+  type Cache {
     required paper_id: str {constraint exclusive};
+    required created: datetime {default := datetime_current()};
+  }
+  type Post extending Cache {
     required title: str;
     required description: str;
     required category: str;
     required tag: str;
-    required created: datetime {default := datetime_current()};
     required modified: datetime {default := datetime_current()};
     required like_count: int64 {default := 0};
     required dislike_count: int64 {default := 0};

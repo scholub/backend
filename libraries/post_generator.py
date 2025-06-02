@@ -8,6 +8,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 
 from ..queries.post import insert_post
+from ..queries.cache import get_cache, insert_cache, gc_cache
 from .initalizer import db, get_data_path
 from .paper import download_arxiv, get_recent_posts
 from .paper_reviewer.reviewer import Reviewer
@@ -88,7 +89,12 @@ async def generate_post(paper_id: str):
 
 
 async def refresh_paper():
+  print("start summarize paper")
   async for paper_id in get_recent_posts():
+    if await get_cache(db, paper_id=paper_id):
+      print(paper_id, "already summarized")
+      continue
+    print(paper_id, "summarizing")
     paper_path = await download_arxiv(paper_id)
     paper_content = PyPDF2.PdfReader(paper_path)
     result = ""
@@ -99,7 +105,9 @@ async def refresh_paper():
     _ = await r.review(result, reflection=2) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
     _ = await r.review_ensembling() # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
     if r.is_review_strong_enough():
+      print(paper_id, "has strong potential")
       _ = await generate_post(paper_id=paper_id)
+    _ = await insert_cache(db, paper_id=paper_id)
 
 if __name__ == "__main__":
   print(asyncio.run(generate_post("2501.12948")))

@@ -1,7 +1,7 @@
-from datetime import datetime
+from collections.abc import AsyncGenerator
+from datetime import datetime, timedelta
 from os.path import getmtime
 from pathlib import Path
-from typing import AsyncGenerator
 
 from arxiv import (  # pyright: ignore[reportMissingTypeStubs]
   Client,
@@ -9,9 +9,8 @@ from arxiv import (  # pyright: ignore[reportMissingTypeStubs]
   SortCriterion,
 )
 
-from libraries.initalizer import (
-  get_data_path,
-)
+from libraries.initalizer import db, get_data_path
+from queries.cache import gc_cache
 
 client = Client()
 slow_client = Client(page_size=1000, num_retries=5, delay_seconds=10)
@@ -41,10 +40,14 @@ async def download_arxiv(paper_id: str, force: bool = False) -> Path:
   return cache
 
 async def refresh_cache():
+  print("starting refresh of arxiv cache")
+  yesterday = datetime.now() - timedelta(days=1)
+  yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
   papers = list(get_data_path("cache").glob("*.pdf"))
-  paper_ids = [i.stem for i in papers]
-  for paper, paper_cached in zip(slow_client.results(Search(id_list=paper_ids)), papers):
-    if paper.updated.timestamp() > getmtime(paper_cached):
+  for paper_cached in papers:
+    if yesterday.timestamp() > getmtime(paper_cached):
       paper_cached.unlink()
-      _ = paper.download_pdf(dirpath=get_data_path("cache").as_posix(), filename=paper_cached.name)
+  print("starting garbage collection of summarize cache")
+  gc_cached = await gc_cache(db, datetime=yesterday)
+  print("garbage collected summarize cache length:", gc_cached)
 
