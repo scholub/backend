@@ -7,12 +7,12 @@ from pytest import raises
 
 from libraries.auth import Data, login_dep, register_jwt, verify_jwt
 from libraries.initalizer import db
-from queries.comment import reaction
 from queries.post import insert_post
 from queries.tests import get_comment_reaction as db_get_reaction
 from queries.user import GetUserByEmailResult
+from routers.post import comment as post_comment
+from routers.post import get_comment
 from routers.user import confirm
-from routers.post import get_comment, comment as post_comment
 
 
 async def get_reaction(db: AsyncIOExecutor, id: UUID):
@@ -24,9 +24,6 @@ async def query(command: str):
   return await db.execute(command) # pyright: ignore[reportUnknownMemberType]
 
 class TestBasic:
-  def __init__(self):
-    self.user: GetUserByEmailResult
-
   async def test_init(self):
     await query("delete Comment::Comment")
     _ = await insert_post(

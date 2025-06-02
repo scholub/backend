@@ -6,7 +6,7 @@ from shutil import rmtree
 
 from arxiv import Client, Search  # pyright: ignore[reportMissingTypeStubs]
 
-from libraries.initalizer import db, get_data_path
+from libraries.initalizer import get_data_path
 from libraries.paper import download_arxiv, refresh_cache
 
 # @fixture(scope='session')
