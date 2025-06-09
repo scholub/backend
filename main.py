@@ -16,6 +16,7 @@ from routers.user import router as user_router
 async def on_start(app: FastAPI): # pyright: ignore[reportUnusedParameter]
   _ = scheduler.add_job(refresh_cache, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
   _ = scheduler.add_job(refresh_paper, 'interval', hours=6) # pyright: ignore[reportUnknownMemberType]
+  _ = scheduler.start() # pyright: ignore[reportUnknownMemberType]
   yield
   scheduler.shutdown() # pyright: ignore[reportUnknownMemberType]
 
