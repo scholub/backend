@@ -23,7 +23,7 @@ async def get_recent_posts() -> AsyncGenerator[str, None]:
     )
   )
   result = next(result_generator)
-  now = datetime.now().date()
+  now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
   while result.published < now:
     yield result.entry_id
     result = next(result_generator)
