@@ -1,14 +1,14 @@
 from os import getenv
 from pathlib import Path
 
-from apscheduler.schedulers.background import (  # pyright: ignore[reportMissingTypeStubs]
-  BackgroundScheduler,
+from apscheduler.schedulers.asyncio import (  # pyright: ignore[reportMissingTypeStubs]
+  AsyncIOScheduler,
 )
 from dotenv import load_dotenv
 from gel import create_async_client  # pyright: ignore[reportUnknownVariableType]
 
 _ = load_dotenv()
-scheduler = BackgroundScheduler()
+scheduler = AsyncIOScheduler()
 db = create_async_client()
 SECRET_KEY = getenv("SECRET_KEY", "")
 if SECRET_KEY == "":
