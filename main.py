@@ -15,7 +15,7 @@ from routers.user import router as user_router
 @asynccontextmanager
 async def on_start(app: FastAPI): # pyright: ignore[reportUnusedParameter]
   _ = scheduler.add_job(refresh_cache, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
-  _ = scheduler.add_job(refresh_paper, 'interval', hours=6) # pyright: ignore[reportUnknownMemberType]
+  _ = scheduler.add_job(refresh_paper, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
   _ = scheduler.start()
   yield
   scheduler.shutdown()
