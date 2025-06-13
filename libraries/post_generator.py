@@ -103,7 +103,7 @@ async def refresh_paper():
     for i in paper_content.pages:
       result += f"{i.extract_text()}\n"
     
-    r = Reviewer(model="o4-mini", prompts_dir="./libraries/paper_reviewer/prompts")
+    r = Reviewer(model="o4-mini", prompts_dir="./libraries/paper_reviewer/prompts/paper_review")
     _ = await r.review(result, reflection=2) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
     _ = await r.review_ensembling() # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
     if r.is_review_strong_enough():
