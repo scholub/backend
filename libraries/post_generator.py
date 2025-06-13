@@ -93,7 +93,7 @@ async def generate_post(paper_id: str):
 async def refresh_paper():
   print("start summarize paper")
   async for paper_id in get_recent_posts():
-    if await get_cache(db, paper_id=paper_id):
+    if await get_cache(db, paper_id=paper_id) is not None:
       print(paper_id, "already summarized")
       continue
     print(paper_id, "summarizing")
