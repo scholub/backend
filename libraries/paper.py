@@ -25,7 +25,7 @@ async def get_recent_posts() -> AsyncGenerator[str, None]:
   result = next(result_generator)
   now = datetime.now(tz=UTC).replace(hour=0, minute=0, second=0, microsecond=0)
   while result.published < now:
-    yield result.entry_id.removeprefix("https://arxiv.org/abs/")
+    yield result.entry_id.removeprefix("http://arxiv.org/abs/")
     result = next(result_generator)
 
 async def download_arxiv(paper_id: str, force: bool = False) -> Path:

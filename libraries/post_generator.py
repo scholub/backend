@@ -70,10 +70,11 @@ async def generate_post(paper_id: str):
     if image_base64 is None:
       raise ValueError("Image generation succeed, but doesn't have image data")
     image_bytes = base64.b64decode(image_base64)
-    _ = (get_data_path("post") / f"{paper_id}/{i.id}.png").write_bytes(image_bytes)
+    post_path = get_data_path(f"post/{paper_id}")
+    _ = (post_path / f"{i.id}.png").write_bytes(image_bytes)
     completion.content = completion.content.replace(
       i.id,
-      (get_data_path("post").relative_to(os.getcwd()) / f"{paper_id}/{i.id}.png").as_uri()
+      f"./{str(post_path)}/{i.id}.png"
     )
 
   _ = (get_data_path("post") / f"{paper_id}/post.md").write_text(completion.content)
@@ -102,7 +103,7 @@ async def refresh_paper():
     for i in paper_content.pages:
       result += f"{i.extract_text()}\n"
     
-    r = Reviewer(model="o4-mini")
+    r = Reviewer(model="o4-mini", prompts_dir="./libraries/paper_reviewer/prompts")
     _ = await r.review(result, reflection=2) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
     _ = await r.review_ensembling() # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
     if r.is_review_strong_enough():
