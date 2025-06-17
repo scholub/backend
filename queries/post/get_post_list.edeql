@@ -1,0 +1,11 @@
+SELECT Paper::Post {
+  id,
+  title,
+  description,
+  category,
+  tag,
+  created,
+  modified,
+  like_count,
+  dislike_count
+};

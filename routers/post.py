@@ -9,8 +9,16 @@ from queries.comment import post_comment
 from queries.post import GetCommentResult, GetPostResult, delete_reaction, reaction
 from queries.post import get_comment as db_get_comment
 from queries.post import get_post as db_get_post
+from queries.post import get_post_list as db_get_post_list
 
 router = APIRouter(prefix="/post", tags=["post"])
+
+@router.get("", responses=generate_error_responses({404}))
+async def get_post_list() -> list[GetPostResult]:
+  resp = await db_get_post_list(db)
+  if resp is None:
+    raise HTTPException(status.HTTP_404_NOT_FOUND)
+  return resp
 
 @router.get("/{paper_id}", responses=generate_error_responses({404}))
 async def get_post(paper_id: str) -> GetPostResult:
