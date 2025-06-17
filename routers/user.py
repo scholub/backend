@@ -4,7 +4,6 @@ from typing import Annotated
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import APIRouter, Body, HTTPException, status
-from fastapi.responses import PlainTextResponse
 from pydantic import EmailStr
 from satellite_py import generate_error_responses
 
@@ -67,11 +66,11 @@ async def confirm(
       "email must be unique."
     )
   _ = await insert_user(db, name=data.name, email=data.email, password=hasher.hash(password))
-  return PlainTextResponse(register_jwt(Data(
+  return register_jwt(Data(
     name=data.name,
     email=data.email,
     confirmed=True
-  )))
+  ))
 
 @router.post("/login", responses=generate_error_responses({401}))
 async def login(
@@ -87,4 +86,4 @@ async def login(
       _ = update_password(db, email=email, password=hasher.hash(password))
   except VerifyMismatchError:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
-  return PlainTextResponse(register_jwt(Data(name=user.name, email=email, confirmed=True)))
+  return register_jwt(Data(name=user.name, email=email, confirmed=True))
