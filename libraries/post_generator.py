@@ -74,7 +74,7 @@ async def generate_post(paper_id: str):
     _ = (post_path / f"{i.id}.png").write_bytes(image_bytes)
     completion.content = completion.content.replace(
       i.id,
-      f"./{str(post_path)}/{i.id}.png"
+      f"/{str(post_path)}/{i.id}.png"
     )
 
   _ = (get_data_path("post") / f"{paper_id}/post.md").write_text(completion.content)
