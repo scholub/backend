@@ -1,4 +1,5 @@
 SELECT Paper::Post {
+  id,
   paper_id,
   created,
   title,

@@ -29,6 +29,7 @@ async def get_post_list(
     return await executor.query(
         """\
         SELECT Paper::Post {
+          id,
           paper_id,
           created,
           title,
