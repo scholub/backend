@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from libraries.initalizer import scheduler
 from libraries.paper import refresh_cache
@@ -32,5 +33,5 @@ app.include_router(oauth_router)
 app.include_router(user_router)
 app.include_router(post_router)
 app.include_router(comment_router)
-
+app.mount("/files", StaticFiles(directory="./files"), name="files")
 
