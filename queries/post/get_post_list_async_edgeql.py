@@ -6,12 +6,10 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import gel
-import uuid
 
 
 @dataclasses.dataclass
 class GetPostListResult:
-    id: uuid.UUID
     paper_id: str
     created: datetime.datetime
     title: str
@@ -29,7 +27,6 @@ async def get_post_list(
     return await executor.query(
         """\
         SELECT Paper::Post {
-          id,
           paper_id,
           created,
           title,
