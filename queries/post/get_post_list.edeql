@@ -1,10 +1,10 @@
 SELECT Paper::Post {
-  id,
+  paper_id,
+  created,
   title,
   description,
   category,
   tag,
-  created,
   modified,
   like_count,
   dislike_count

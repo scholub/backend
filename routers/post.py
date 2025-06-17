@@ -6,7 +6,7 @@ from satellite_py import generate_error_responses
 from libraries.auth import cookieDep
 from libraries.initalizer import db
 from queries.comment import post_comment
-from queries.post import GetCommentResult, GetPostResult, delete_reaction, reaction
+from queries.post import GetCommentResult, GetPostResult, GetPostListResult, delete_reaction, reaction
 from queries.post import get_comment as db_get_comment
 from queries.post import get_post as db_get_post
 from queries.post import get_post_list as db_get_post_list
@@ -14,7 +14,7 @@ from queries.post import get_post_list as db_get_post_list
 router = APIRouter(prefix="/post", tags=["post"])
 
 @router.get("", responses=generate_error_responses({404}))
-async def get_post_list() -> list[GetPostResult]:
+async def get_post_list() -> list[GetPostListResult]:
   resp = await db_get_post_list(db)
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
