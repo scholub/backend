@@ -35,10 +35,9 @@ async def get_post_list(
         };\
         """
     )
-    if result is None: return []
 
     return [GetPostListResult(
-            post_id=item.paper_id,
+            paper_id=item.paper_id,
             created=item.created,
             title=item.title,
             description=item.description,
