@@ -3,7 +3,7 @@ import base64
 import os
 from pathlib import Path
 
-import PyPDF2
+import pypdf
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -37,7 +37,7 @@ async def generate_post(paper_id: str):
   prompt = Path("./prompts/post.txt").read_text()
 
   with open(paper_path, "rb") as file:
-    reader = PyPDF2.PdfReader(file)
+    reader = pypdf.PdfReader(file)
     text = ""
     for page in reader.pages:
       text += page.extract_text() or ""
@@ -98,7 +98,7 @@ async def refresh_paper():
       continue
     print(paper_id, "summarizing")
     paper_path = await download_arxiv(paper_id)
-    paper_content = PyPDF2.PdfReader(paper_path)
+    paper_content = pypdf.PdfReader(paper_path)
     result = ""
     for i in paper_content.pages:
       result += f"{i.extract_text()}\n"

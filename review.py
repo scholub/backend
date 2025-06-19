@@ -1,6 +1,6 @@
 from asyncio import run
 
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 
 from libraries.paper import download_arxiv
 from libraries.paper_reviewer import Reviewer

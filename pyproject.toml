@@ -3,27 +3,27 @@ name = "scholub"
 version = "0.1.0"
 description = "Backend of scholub"
 readme = "README.md"
-requires-python = "==3.13.3"
+requires-python = ">=3.13.3"
 dependencies = [
   "apscheduler==3.11.0",
-  "argon2-cffi==23.1.0",
+  "argon2-cffi==25.1.0",
   "arxiv==2.2.0",
-  "authlib==1.5.2",
-  "fastapi[standard]==0.115.12",
+  "authlib==1.6.0",
+  "fastapi[standard]==0.115.13",
   "gel==3.1.0",
   "itsdangerous==2.2.0",
-  "openai>=1.78.0",
-  "pydantic==2.11.4",
+  "openai==1.88.0",
+  "pydantic==2.11.7",
   "pyjwt==2.10.1",
-  "pypdf2>=3.0.1",
-  "pytest-asyncio==0.26.0",
+  "pypdf==5.6.0",
+  "pytest-asyncio==1.0.0",
   "python-dotenv==1.1.0",
   "satellite-py==0.1.9",
 ]
 
 [dependency-groups]
 dev = [
-  "pytest==8.3.5",
+  "pytest==8.4.1",
 ]
 
 [tool.ruff.lint]
