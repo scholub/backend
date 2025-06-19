@@ -4,6 +4,7 @@ import os
 from contextlib import suppress
 from pathlib import Path
 
+from gel.errors import ConstraintViolationError
 import pypdf
 from openai import OpenAI
 from pydantic import BaseModel
@@ -112,7 +113,8 @@ async def refresh_paper():
       if r.is_review_strong_enough():
         print(paper_id, "has strong potential")
         _ = await generate_post(paper_id=paper_id)
-      _ = await insert_cache(db, paper_id=paper_id)
+      with suppress(ConstraintViolationError):
+        _ = await insert_cache(db, paper_id=paper_id)
 
 if __name__ == "__main__":
   print(asyncio.run(generate_post("2501.12948")))
