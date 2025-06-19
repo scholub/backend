@@ -1,11 +1,13 @@
 import asyncio
 import base64
 import os
+from contextlib import suppress
 from pathlib import Path
 
 import pypdf
 from openai import OpenAI
 from pydantic import BaseModel
+from pypdf.errors import PdfStreamError
 
 from queries.cache import get_cache, insert_cache
 from queries.post import insert_post
@@ -98,18 +100,19 @@ async def refresh_paper():
       continue
     print(paper_id, "summarizing")
     paper_path = await download_arxiv(paper_id)
-    paper_content = pypdf.PdfReader(paper_path)
-    result = ""
-    for i in paper_content.pages:
-      result += f"{i.extract_text()}\n"
-    
-    r = Reviewer(model="o4-mini", prompts_dir="./libraries/paper_reviewer/prompts/paper_review")
-    _ = await r.review(result, reflection=2) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
-    _ = await r.review_ensembling() # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
-    if r.is_review_strong_enough():
-      print(paper_id, "has strong potential")
-      _ = await generate_post(paper_id=paper_id)
-    _ = await insert_cache(db, paper_id=paper_id)
+    with suppress(PdfStreamError):
+      paper_content = pypdf.PdfReader(paper_path)
+      result = ""
+      for i in paper_content.pages:
+        result += f"{i.extract_text()}\n"
+      
+      r = Reviewer(model="o4-mini", prompts_dir="./libraries/paper_reviewer/prompts/paper_review")
+      _ = await r.review(result, reflection=2) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+      _ = await r.review_ensembling() # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+      if r.is_review_strong_enough():
+        print(paper_id, "has strong potential")
+        _ = await generate_post(paper_id=paper_id)
+      _ = await insert_cache(db, paper_id=paper_id)
 
 if __name__ == "__main__":
   print(asyncio.run(generate_post("2501.12948")))
