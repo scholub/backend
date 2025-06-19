@@ -39,7 +39,7 @@ async def register(ws: WebSocket):
     )
   send_email(
     "Verification request from Scholub",
-    f"{domain}/confirm?token={register_jwt(Data(
+    f"{domain}/user/confirm?token={register_jwt(Data(
       name='',
       email=email,
       confirmed=False
