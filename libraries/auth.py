@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from sys import modules
 from typing import Annotated
 
-from fastapi import Cookie, Depends, HTTPException
+from fastapi import Depends, Header, HTTPException
 from jwt import decode, encode
 from pydantic import BaseModel, EmailStr
 from starlette import status
@@ -40,10 +40,10 @@ def verify_jwt(token: str, require_confirm: bool = True) -> Data | None:
       raise e
     return None
 
-async def login_dep(auth: Annotated[str | None, Cookie()] = None):
-  if auth is None:
+async def login_dep(token: Annotated[str | None, Header(description="jwt token")] = None):
+  if token is None:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED)
-  data = verify_jwt(auth)
+  data = verify_jwt(token)
   if data is None:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED)
   user = await get_user_by_email(db, email=data.email)
