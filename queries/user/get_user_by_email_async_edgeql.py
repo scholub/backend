@@ -14,6 +14,12 @@ class GetUserByEmailResult:
     name: str
     email: str
     password: str
+    bookmarks: list[GetUserByEmailResultBookmarksItem]
+
+
+@dataclasses.dataclass
+class GetUserByEmailResultBookmarksItem:
+    id: uuid.UUID
 
 
 async def get_user_by_email(
@@ -24,7 +30,7 @@ async def get_user_by_email(
     return await executor.query_single(
         """\
         select User {
-          name, email, password
+          name, email, password, bookmarks
         } filter .email = <str>$email limit 1;\
         """,
         email=email,

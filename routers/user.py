@@ -9,7 +9,7 @@ from fastapi import APIRouter, Body, HTTPException, WebSocket, status
 from pydantic import EmailStr
 from satellite_py import generate_error_responses
 
-from libraries.auth import Data, register_jwt, verify_jwt
+from libraries.auth import Data, cookieDep, register_jwt, verify_jwt
 from libraries.initalizer import db
 from libraries.mailer import send_email
 from queries.user import (
@@ -112,3 +112,14 @@ async def login(
   except VerifyMismatchError:
     raise HTTPException(status.HTTP_401_UNAUTHORIZED, "login failed")
   return register_jwt(Data(name=user.name, email=email, confirmed=True))
+
+@router.get("/verify", responses=generate_error_responses({401}))
+async def verify(
+  user: cookieDep
+):
+  return {
+    "name": user.name,
+    "email": user.email,
+    "bookmarks": user.bookmarks,
+    "confirmed": True
+  }
