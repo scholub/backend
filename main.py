@@ -24,7 +24,10 @@ async def on_start(app: FastAPI): # pyright: ignore[reportUnusedParameter]
 app = FastAPI(lifespan=on_start)
 app.add_middleware(
   CORSMiddleware,
-  allow_origins=["http://localhost:5173"],
+  allow_origins=[
+    "http://localhost:5173",
+    "https://frontend-9ih.pages.dev"
+  ],
   allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"]
