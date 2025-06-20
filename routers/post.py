@@ -7,7 +7,7 @@ from libraries.auth import cookieDep
 from libraries.initalizer import db
 from queries.comment import post_comment
 from queries.post import (
-  GetCommentResult,
+  GetCommentResultCommentsItem,
   GetPostListResult,
   GetPostResult,
   delete_reaction,
@@ -49,12 +49,12 @@ async def reaction_delete(
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
 
-@router.get("/{paper_id}/comment", responses=generate_error_responses({404}), response_model=GetCommentResult)
-async def get_comment(paper_id: str):
+@router.get("/{paper_id}/comment", responses=generate_error_responses({404}))
+async def get_comment(paper_id: str) -> list[GetCommentResultCommentsItem]:
   resp = await db_get_comment(db, paper_id=paper_id)
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
-  return resp
+  return resp.comments
 
 @router.post("/{paper_id}/comment", responses=generate_error_responses({401, 404}))
 async def comment(
