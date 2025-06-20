@@ -4,6 +4,7 @@ from libraries.initalizer import db
 from queries.user.get_user_by_email_async_edgeql import (GetUserByEmailResult, 
                                                          GetUserByEmailResultBookmarksItem, 
                                                          get_user_by_email)
+from queries.user import insert_recommendation
 
 from queries.post.get_post_async_edgeql import get_post
 
@@ -11,13 +12,14 @@ import math
 import numpy as np
 from sklearn.cluster import KMeans
 import asyncio
+from uuid import UUID
 
-
-class RecomendPostResult(BaseModel):
+class RecommendPostResult(BaseModel):
+    id: UUID = Field(description="The internal ID of the result.")
     paper_id : str = Field( description="The ID of the recommended paper_id.")
     similarity_score: float = Field( description="The similarity score of the recommended post." )
 
-async def cluster_recommendations(emb_matrix: np.ndarray,
+def cluster_recommendations(emb_matrix: np.ndarray,
                              paper_ids: list[str],
                              top_n_per_cluster: int,
                              max_results: int) -> list[tuple[str, float]]:
@@ -54,8 +56,10 @@ async def cluster_recommendations(emb_matrix: np.ndarray,
 # - 클러스터 중심점 찍고, 그 값으로 벡터 검색
 # - 그리고 검색된 (post id, 유사도)를 상위 10개만 리턴
 
-async def recomend_post(user_email: str, top_n_per_cluster: int = 3, max_results: int = 10) -> list[RecomendPostResult]: 
-    res: GetUserByEmailResult = await get_user_by_email(db, email=user_email)
+async def recommend_post(user_email: str, top_n_per_cluster: int = 3, max_results: int = 10) -> list[GetPostResult]: 
+    res = await get_user_by_email(db, email=user_email)
+    if res is None:
+        return []
     bookmarks:list[GetUserByEmailResultBookmarksItem] = res.bookmarks
     if not bookmarks:
         return []
@@ -72,10 +76,10 @@ async def recomend_post(user_email: str, top_n_per_cluster: int = 3, max_results
         top_n_per_cluster,
         max_results
     )
-    post_results = []
+    post_results: list[RecommendPostResult] = []
     for pid, score in recs:
         post = await get_post(db, paper_id=pid)
         if post:
-            post_results.append(RecomendPostResult(paper_id=pid, similarity_score=score))
-    
+            post_results.append(RecommendPostResult(id=post.id, paper_id=pid, similarity_score=score))
+    _ = await insert_recommendation(db, email=user_email, recommendation=[i.id for i in post_results]) 
     return post_results

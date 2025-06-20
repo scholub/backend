@@ -12,7 +12,7 @@ dependencies = [
   "fastapi[standard]==0.115.13",
   "gel==3.1.0",
   "itsdangerous==2.2.0",
-  "numpy>=2.3.0",
+  "numpy==2.3.0",
   "openai==1.88.0",
   "pydantic==2.11.7",
   "pyjwt==2.10.1",
@@ -20,7 +20,7 @@ dependencies = [
   "pytest-asyncio==1.0.0",
   "python-dotenv==1.1.0",
   "satellite-py==0.1.9",
-  "scikit-learn>=1.7.0",
+  "scikit-learn==1.7.0",
 ]
 
 [dependency-groups]
