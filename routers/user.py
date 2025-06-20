@@ -5,7 +5,7 @@ from typing import Annotated
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import APIRouter, Body, HTTPException, WebSocket, status
+from fastapi import APIRouter, Body, HTTPException, Param, WebSocket, status
 from pydantic import EmailStr
 from satellite_py import generate_error_responses
 
@@ -31,12 +31,13 @@ async def register(ws: WebSocket):
   email = await ws.receive_text()
   email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
   if not re.match(email_regex, email):
-    raise HTTPException(status.HTTP_400_BAD_REQUEST)
+    await ws.send_json({"error": 400, "data": "email isn't valid"})
+    await ws.close()
+    return
   if (await get_user_by_email(db, email=email)) is not None:
-    raise HTTPException(
-      status.HTTP_409_CONFLICT,
-      "email must be unique."
-    )
+    await ws.send_json({"error": 409, "data": "user already exist"})
+    await ws.close()
+    return
   send_email(
     "Verification request from Scholub",
     f"{domain}/user/confirm?token={register_jwt(Data(
@@ -57,9 +58,9 @@ async def register(ws: WebSocket):
       await ws.close()
     await sleep(1)
 
-@router.post("/confirm", responses=generate_error_responses({401}))
+@router.get("/confirm", responses=generate_error_responses({401}))
 async def confirm(
-  token: Annotated[str, Body(description="jwt token")]
+  token: Annotated[str, Param(description="jwt token")]
 ):
   data = verify_jwt(token, False)
   if data is None:
