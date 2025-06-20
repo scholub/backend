@@ -4,13 +4,18 @@ from fastapi import APIRouter
 
 from libraries.auth import cookieDep
 from libraries.initalizer import db
-from queries.posts import get_posts, get_posts_like_order
+from queries.posts import (
+  GetPostsLikeOrderResult,
+  GetPostsResult,
+  get_posts,
+  get_posts_like_order,
+)
 from queries.user import GetRecommendsResultRecommendsItem, get_recommends
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
 @router.get("/")
-async def posts():
+async def posts() -> list[GetPostsResult]:
   return await get_posts(db)
 
 
@@ -25,7 +30,7 @@ async def recommend_posts(user: cookieDep) -> list[GetRecommendsResultRecommends
 async def posts_like(
   start_date: datetime,
   end_date: datetime
-):
+) -> list[GetPostsLikeOrderResult]:
   return await get_posts_like_order(db, start_date=start_date, end_date=end_date)
 
 
