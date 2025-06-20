@@ -5,7 +5,7 @@ from queries.user.get_user_by_email_async_edgeql import (GetUserByEmailResult,
                                                          GetUserByEmailResultBookmarksItem, 
                                                          get_user_by_email)
 
-from queries.post.get_post_async_edgeql import get_post, GetPostResult
+from queries.post.get_post_async_edgeql import get_post
 
 import math
 import numpy as np
@@ -54,7 +54,7 @@ async def cluster_recommendations(emb_matrix: np.ndarray,
 # - 클러스터 중심점 찍고, 그 값으로 벡터 검색
 # - 그리고 검색된 (post id, 유사도)를 상위 10개만 리턴
 
-async def recomend_post(user_email: str, top_n_per_cluster: int = 3, max_results: int = 10) -> list[GetPostResult]: 
+async def recomend_post(user_email: str, top_n_per_cluster: int = 3, max_results: int = 10) -> list[RecomendPostResult]: 
     res: GetUserByEmailResult = await get_user_by_email(db, email=user_email)
     bookmarks:list[GetUserByEmailResultBookmarksItem] = res.bookmarks
     if not bookmarks:
@@ -76,6 +76,6 @@ async def recomend_post(user_email: str, top_n_per_cluster: int = 3, max_results
     for pid, score in recs:
         post = await get_post(db, paper_id=pid)
         if post:
-            post_results.append(post)
+            post_results.append(RecomendPostResult(paper_id=pid, similarity_score=score))
     
     return post_results
