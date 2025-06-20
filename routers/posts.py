@@ -9,19 +9,19 @@ from queries.user import GetRecommendsResultRecommendsItem, get_recommends
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
-@router.get("/posts")
+@router.get("/")
 async def posts():
   return await get_posts(db)
 
 
-@router.get("/posts/recommend")
+@router.get("/recommend")
 async def recommend_posts(user: cookieDep) -> list[GetRecommendsResultRecommendsItem]:
   resp = await get_recommends(db, email=user.email)
   if resp is not None:
     return resp.recommends
   return []
 
-@router.get("/posts/like")
+@router.get("/like")
 async def posts_like(
   start_date: datetime,
   end_date: datetime
