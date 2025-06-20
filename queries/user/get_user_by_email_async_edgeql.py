@@ -3,9 +3,13 @@
 
 
 from __future__ import annotations
+import array
 import dataclasses
 import gel
 import uuid
+
+
+PaperEmbedding = array.array
 
 
 class NoPydanticValidation:
@@ -36,6 +40,8 @@ class GetUserByEmailResult(NoPydanticValidation):
 @dataclasses.dataclass
 class GetUserByEmailResultBookmarksItem(NoPydanticValidation):
     id: uuid.UUID
+    paper_id: str
+    embedding: PaperEmbedding
 
 
 async def get_user_by_email(
@@ -46,7 +52,10 @@ async def get_user_by_email(
     return await executor.query_single(
         """\
         select User {
-          name, email, password, bookmarks
+          name, email, password, bookmarks: {
+            paper_id,
+            embedding
+          }
         } filter .email = <str>$email limit 1;\
         """,
         email=email,
