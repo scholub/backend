@@ -2,9 +2,9 @@
 server-version = "6.7"
 
 [hooks]
-schema.update.after = "uv run gel-py --dir queries --no-skip-pydantic-validation"
+schema.update.after = "uv run gel-py --dir queries"
 
 [[watch]]
 files = ["queries/*.edgeql"]
-script = "uv run gel-py --dir queries --no-skip-pydantic-validation"
+script = "uv run gel-py --dir queries"
 

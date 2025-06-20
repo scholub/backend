@@ -13,6 +13,7 @@ from queries.post import (
   delete_reaction,
   insert_bookmark,
   reaction,
+  select_reaction,
 )
 from queries.post import get_comment as db_get_comment
 from queries.post import get_post as db_get_post
@@ -30,6 +31,16 @@ async def get_post(paper_id: str) -> GetPostResult:
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
   return resp
+
+@router.get("/{paper_id}/reaction", responses=generate_error_responses({401, 404}))
+async def reaction_get(
+  paper_id: str,
+  user: cookieDep
+):
+  resp = await select_reaction(db, paper_id=paper_id, user_id=user.id)
+  if resp is None:
+    return None
+  return resp.is_like
 
 @router.post("/{paper_id}/reaction", responses=generate_error_responses({401, 404}))
 async def reaction_post(
