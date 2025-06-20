@@ -6,7 +6,7 @@ from queries.user.get_user_by_email_async_edgeql import (GetUserByEmailResult,
                                                          get_user_by_email)
 from queries.user import insert_recommendation
 
-from queries.post.get_post_async_edgeql import get_post
+from queries.post.get_post_async_edgeql import GetPostResult, get_post
 
 import math
 import numpy as np
