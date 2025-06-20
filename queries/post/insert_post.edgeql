@@ -3,5 +3,6 @@ insert Paper::Post {
   description := <str>$description,
   paper_id := <str>$paper_id,
   category := <str>$category,
-  tag := <str>$tag
+  tag := <str>$tag,
+  embedding := <Paper::Embedding>$embedding
 };

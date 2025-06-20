@@ -1,4 +1,7 @@
+using extension pgvector;
+
 module Paper {
+  scalar type Embedding extending ext::pgvector::vector<1536>;
   type Cache {
     required paper_id: str {constraint exclusive};
     required created: datetime {default := datetime_current()};
@@ -11,7 +14,9 @@ module Paper {
     required modified: datetime {default := datetime_current()};
     required like_count: int64 {default := 0};
     required dislike_count: int64 {default := 0};
+    required embedding: Embedding;
     multi comments: Comment::Comment;
+    index on ext::pgvector::ivfflat_cosine(lists := 1) on (.embedding);
   }
   type Reaction {
     required is_like: bool;

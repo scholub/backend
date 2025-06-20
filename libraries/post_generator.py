@@ -4,8 +4,8 @@ import os
 from contextlib import suppress
 from pathlib import Path
 
-from gel.errors import ConstraintViolationError
 import pypdf
+from gel.errors import ConstraintViolationError
 from openai import OpenAI
 from pydantic import BaseModel
 from pypdf.errors import PdfStreamError
@@ -87,7 +87,11 @@ async def generate_post(paper_id: str):
     description=completion.summary,
     paper_id=paper_id,
     category="",
-    tag=""
+    tag="",
+    embedding=client.embeddings.create(
+      input=completion.content,
+      model="text-embedding-3-small"
+    ).data[0].embedding
   )
 
   return completion.content
