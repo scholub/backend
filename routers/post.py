@@ -15,6 +15,7 @@ from queries.post import (
   reaction,
   select_reaction,
 )
+from queries.post import delete_bookmark as db_delete_bookmark
 from queries.post import get_comment as db_get_comment
 from queries.post import get_post as db_get_post
 from queries.post import get_post_list as db_get_post_list
@@ -84,4 +85,8 @@ async def bookmark(user: cookieDep, paper_id: str):
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
   return resp
+
+@router.delete("/{paper_id}/bookmark", responses=generate_error_responses({401, 404}))
+async def delete_bookmark(user: cookieDep, paper_id: str):
+  _ = await db_delete_bookmark(db, paper_id=paper_id, email=user.email)
 
