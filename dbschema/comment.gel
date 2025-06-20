@@ -9,7 +9,9 @@ module Comment {
   type Reaction {
     required is_like: bool;
     required user: default::User;
-    required comment: Comment;
+    required comment: Comment {
+      on target delete delete source;
+    };
     constraint exclusive on ((.user, .comment));
   }
 }
