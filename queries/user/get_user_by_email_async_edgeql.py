@@ -7,7 +7,7 @@ import array
 import dataclasses
 import gel
 import uuid
-from queries.post.get_post_async_edgeql import GetPostResult
+
 
 PaperEmbedding = array.array
 
@@ -35,7 +35,7 @@ class GetUserByEmailResult(NoPydanticValidation):
     email: str
     password: str
     bookmarks: list[GetUserByEmailResultBookmarksItem]
-    recommends: list[GetPostResult]
+    recommends: list[GetUserByEmailResultRecommendsItem]
     profile_image: str
 
 
@@ -46,6 +46,12 @@ class GetUserByEmailResultBookmarksItem(NoPydanticValidation):
     embedding: PaperEmbedding
 
 
+@dataclasses.dataclass
+class GetUserByEmailResultRecommendsItem(NoPydanticValidation):
+    id: uuid.UUID
+    paper_id: str
+
+
 async def get_user_by_email(
     executor: gel.AsyncIOExecutor,
     *,
@@ -54,17 +60,17 @@ async def get_user_by_email(
     return await executor.query_single(
         """\
         select User {
-        name,
-        email,
-        password,
-        bookmarks: {
+          name,
+          email,
+          password,
+          bookmarks: {
             paper_id,
             embedding
-        },
-        recommends:{
+          },
+          recommends:{
             paper_id
-        },
-        profile_image
+          },
+          profile_image
         } filter .email = <str>$email limit 1;\
         """,
         email=email,

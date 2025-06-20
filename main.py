@@ -7,6 +7,9 @@ from fastapi.staticfiles import StaticFiles
 from libraries.initalizer import scheduler
 from libraries.paper import refresh_cache
 from libraries.post_generator import refresh_paper
+from libraries.recommend import (
+  recommend_post,  # pyright: ignore[reportUnknownVariableType]
+)
 from routers.comment import router as comment_router
 from routers.oauth import router as oauth_router
 from routers.post import router as post_router
@@ -17,6 +20,7 @@ from routers.user import router as user_router
 async def on_start(app: FastAPI): # pyright: ignore[reportUnusedParameter]
   _ = scheduler.add_job(refresh_cache, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
   _ = scheduler.add_job(refresh_paper, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
+  _ = scheduler.add_job(recommend_post, 'interval', days=1) # pyright: ignore[reportUnknownMemberType]
   _ = scheduler.start()
   yield
   scheduler.shutdown()
