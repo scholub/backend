@@ -8,7 +8,7 @@ from libraries.auth import cookieDep
 from libraries.initalizer import db
 from queries.comment import delete_comment, delete_reaction, get_comment, reaction
 
-router = APIRouter(prefix="/comment", tags=["post", "comment"])
+router = APIRouter(prefix="/comment", tags=["comment"])
 
 @router.post("/{comment_id}/reaction", responses=generate_error_responses({401, 404}))
 async def reaction_comment(
