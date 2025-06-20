@@ -31,11 +31,11 @@ async def register(ws: WebSocket):
   email = await ws.receive_text()
   email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
   if not re.match(email_regex, email):
-    await ws.send_json({"error": 400, "data": "email isn't valid"})
+    await ws.send_json({"status": 400, "data": "email isn't valid"})
     await ws.close()
     return
   if (await get_user_by_email(db, email=email)) is not None:
-    await ws.send_json({"error": 409, "data": "user already exist"})
+    await ws.send_json({"status": 409, "data": "user already exist"})
     await ws.close()
     return
   send_email(
@@ -50,11 +50,11 @@ async def register(ws: WebSocket):
   while True:
     if email in confirmed:
       confirmed.remove(email)
-      await ws.send_text(register_jwt(Data(
+      await ws.send_json({"status": 200, "data": register_jwt(Data(
         name='',
         email=email,
         confirmed=True
-      )))
+      ))})
       await ws.close()
     await sleep(1)
 
