@@ -7,9 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from libraries.initalizer import scheduler
 from libraries.paper import refresh_cache
 from libraries.post_generator import refresh_paper
-from libraries.recommend import (
-  recommend_post,  # pyright: ignore[reportUnknownVariableType]
-)
+from libraries.recommend import recommend_post
 from routers.comment import router as comment_router
 from routers.oauth import router as oauth_router
 from routers.post import router as post_router
