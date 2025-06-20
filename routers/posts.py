@@ -33,10 +33,10 @@ async def posts_like(
 ) -> list[GetPostsLikeOrderResult]:
   if start_date is None:
     today = datetime.now().date()
-    start_date = datetime.combine(today, time.min)
+    start_date = datetime.combine(today, time.min).replace(tzinfo=datetime.now().astimezone().tzinfo)
   if end_date is None:
     today = datetime.now().date()
-    end_date = datetime.combine(today, time.max)
+    end_date = datetime.combine(today, time.max).replace(tzinfo=datetime.now().astimezone().tzinfo)
   return await get_posts_like_order(db, start_date=start_date, end_date=end_date)
 
 
