@@ -34,6 +34,8 @@ class GetRecommendsResult(NoPydanticValidation):
 class GetRecommendsResultRecommendsItem(NoPydanticValidation):
     id: uuid.UUID
     paper_id: str
+    title: str
+    description: str
 
 
 async def get_recommends(
@@ -44,7 +46,11 @@ async def get_recommends(
     return await executor.query_single(
         """\
         select User {
-          recommends: { paper_id }
+          recommends: {
+            paper_id,
+            title,
+            description
+          }
         } filter .email = <str>$email;\
         """,
         email=email,
