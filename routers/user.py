@@ -6,13 +6,14 @@ from typing import Annotated
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import APIRouter, Body, HTTPException, WebSocket, status
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 from satellite_py import generate_error_responses
 
 from libraries.auth import Data, cookieDep, register_jwt, verify_jwt
 from libraries.initalizer import db
 from libraries.mailer import send_email
 from queries.user import (
+  GetUserByEmailResultBookmarksItem,
   get_user_by_email,
   get_user_by_name,
   insert_user,
@@ -24,6 +25,11 @@ router = APIRouter(prefix="/user", tags=["user"])
 domain = getenv("ROOT_DOMAIN", "http://localhost:8080")
 hasher = PasswordHasher()
 confirmed: set[str] = set()
+
+class VerifyReturn(BaseModel):
+  name: str
+  email: EmailStr
+  bookmarks: list[GetUserByEmailResultBookmarksItem]
 
 @router.websocket("/register")
 async def register(ws: WebSocket):
@@ -117,10 +123,9 @@ async def login(
 @router.get("/verify", responses=generate_error_responses({401}))
 async def verify(
   user: cookieDep
-):
-  return {
-    "name": user.name,
-    "email": user.email,
-    "bookmarks": user.bookmarks,
-    "confirmed": True
-  }
+) -> VerifyReturn:
+  return VerifyReturn(
+    name=user.name,
+    email=user.email,
+    bookmarks=user.bookmarks
+  )
