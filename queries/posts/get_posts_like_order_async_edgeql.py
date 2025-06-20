@@ -28,6 +28,8 @@ class NoPydanticValidation:
 @dataclasses.dataclass
 class GetPostsLikeOrderResult(NoPydanticValidation):
     id: uuid.UUID
+    title: str
+    description: str
     paper_id: str
 
 
@@ -40,9 +42,15 @@ async def get_posts_like_order(
     return await executor.query(
         """\
         with post := (select Paper::Post {
+          title,
+          description,
           paper_id
         } filter .modified >= <datetime>$start_date and .modified <= <datetime>$end_date)
-        select post {paper_id} order by .like_count desc limit 10;\
+        select post {
+          title,
+          description,
+          paper_id
+        } order by .like_count desc limit 10;\
         """,
         start_date=start_date,
         end_date=end_date,
