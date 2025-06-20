@@ -6,9 +6,25 @@ from satellite_py import generate_error_responses
 
 from libraries.auth import cookieDep
 from libraries.initalizer import db
-from queries.comment import delete_comment, delete_reaction, get_comment, reaction
+from queries.comment import (
+  delete_comment,
+  delete_reaction,
+  get_comment,
+  reaction,
+  select_reaction,
+)
 
 router = APIRouter(prefix="/comment", tags=["comment"])
+
+@router.get("/{comment_id}/reaction", responses=generate_error_responses({401, 404}))
+async def reaction_get(
+  comment_id: UUID,
+  user: cookieDep
+):
+  resp = await select_reaction(db, comment_id=comment_id, user_id=user.id)
+  if resp is None:
+    return None
+  return resp.is_like
 
 @router.post("/{comment_id}/reaction", responses=generate_error_responses({401, 404}))
 async def reaction_comment(
