@@ -13,7 +13,6 @@ from libraries.auth import Data, cookieDep, register_jwt, verify_jwt
 from libraries.initalizer import db
 from libraries.mailer import send_email
 from queries.user import (
-  GetUserByEmailResultBookmarksItem,
   get_user_by_email,
   get_user_by_name,
   insert_user,
@@ -29,7 +28,7 @@ confirmed: set[str] = set()
 class VerifyReturn(BaseModel):
   name: str
   email: EmailStr
-  bookmarks: list[GetUserByEmailResultBookmarksItem]
+  bookmarks: list[str]
 
 @router.websocket("/register")
 async def register(ws: WebSocket):
@@ -127,5 +126,5 @@ async def verify(
   return VerifyReturn(
     name=user.name,
     email=user.email,
-    bookmarks=user.bookmarks
+    bookmarks=[i.paper_id for i in user.bookmarks]
   )
