@@ -11,7 +11,7 @@ import uuid
 
 @dataclasses.dataclass
 class GetPostResult:
-    # id: uuid.UUID
+    id: uuid.UUID
     title: str
     description: str
     paper_id: str
@@ -28,8 +28,7 @@ async def get_post(
     *,
     paper_id: str,
 ) -> GetPostResult | None:
-    
-    result = await executor.query_single(
+    return await executor.query_single(
         """\
         select Paper::Post {
           title,
@@ -45,16 +44,3 @@ async def get_post(
         """,
         paper_id=paper_id,
     )
-
-    
-    return GetPostResult(
-        title=result.title,
-        description=result.description,
-        paper_id=result.paper_id,
-        category=result.category,
-        tag=result.tag,
-        created=result.created,
-        modified=result.modified,
-        like_count=result.like_count,
-        dislike_count=result.dislike_count
-    ) if result else None
