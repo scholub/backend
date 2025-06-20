@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, status
+from fastapi import APIRouter, Header, HTTPException, status
 from satellite_py import generate_error_responses
 
 from libraries.auth import cookieDep
@@ -33,7 +33,7 @@ async def get_post(paper_id: str) -> GetPostResult:
 @router.post("/{paper_id}/reaction", responses=generate_error_responses({401, 404}))
 async def reaction_post(
   paper_id: str,
-  like: Annotated[bool, Body(description="if true do like, else dislike")],
+  like: Annotated[bool, Header(description="if true do like, else dislike")],
   user: cookieDep
 ):
   resp = await reaction(db, user_id=user.id, paper_id=paper_id, is_like=like)
