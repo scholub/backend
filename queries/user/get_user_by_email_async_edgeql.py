@@ -35,6 +35,7 @@ class GetUserByEmailResult(NoPydanticValidation):
     email: str
     password: str
     bookmarks: list[GetUserByEmailResultBookmarksItem]
+    profile_image: str
 
 
 @dataclasses.dataclass
@@ -52,10 +53,14 @@ async def get_user_by_email(
     return await executor.query_single(
         """\
         select User {
-          name, email, password, bookmarks: {
+          name,
+          email,
+          password,
+          bookmarks: {
             paper_id,
             embedding
-          }
+          },
+          profile_image
         } filter .email = <str>$email limit 1;\
         """,
         email=email,

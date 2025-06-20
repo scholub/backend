@@ -3,6 +3,7 @@ module default {
     required name: str {constraint exclusive;};
     required email: str {constraint exclusive;};
     required password: str;
+    required profile_image: str;
     multi bookmarks: Paper::Post;
   }
 }
