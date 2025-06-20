@@ -49,8 +49,8 @@ async def reaction_delete(
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
 
-@router.get("/{paper_id}/comment", responses=generate_error_responses({404}))
-async def get_comment(paper_id: str) -> GetCommentResult:
+@router.get("/{paper_id}/comment", responses=generate_error_responses({404}), response_model=GetCommentResult)
+async def get_comment(paper_id: str):
   resp = await db_get_comment(db, paper_id=paper_id)
   if resp is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
