@@ -11,6 +11,7 @@ from libraries.recommend import recommend_post
 from routers.comment import router as comment_router
 from routers.oauth import router as oauth_router
 from routers.post import router as post_router
+from routers.posts import router as posts_router
 from routers.user import router as user_router
 
 
@@ -37,6 +38,7 @@ app.add_middleware(
 app.include_router(oauth_router)
 app.include_router(user_router)
 app.include_router(post_router)
+app.include_router(posts_router)
 app.include_router(comment_router)
 app.mount("/files", StaticFiles(directory="./files"), name="files")
 
