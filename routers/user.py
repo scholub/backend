@@ -5,7 +5,7 @@ from typing import Annotated
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import APIRouter, Body, HTTPException, Param, WebSocket, status
+from fastapi import APIRouter, Body, HTTPException, Path, WebSocket, status
 from pydantic import EmailStr
 from satellite_py import generate_error_responses
 
@@ -60,7 +60,7 @@ async def register(ws: WebSocket):
 
 @router.get("/confirm", responses=generate_error_responses({401}))
 async def confirm(
-  token: Annotated[str, Param(description="jwt token")]
+  token: Annotated[str, Path(description="jwt token")]
 ):
   data = verify_jwt(token, False)
   if data is None:
