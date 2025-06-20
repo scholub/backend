@@ -11,6 +11,7 @@ from queries.post import (
   GetPostListResult,
   GetPostResult,
   delete_reaction,
+  insert_bookmark,
   reaction,
 )
 from queries.post import get_comment as db_get_comment
@@ -65,4 +66,11 @@ async def comment(
   post = await post_comment(db, content=content, paper_id=paper_id, user_id=user.id)
   if post is None:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+@router.post("/{paper_id}/bookmark", responses=generate_error_responses({401, 404}))
+async def bookmark(user: cookieDep, paper_id: str):
+  resp = await insert_bookmark(db, paper_id=paper_id, email=user.email)
+  if resp is None:
+    raise HTTPException(status.HTTP_404_NOT_FOUND)
+  return resp
 

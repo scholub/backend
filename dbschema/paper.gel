@@ -16,7 +16,7 @@ module Paper {
     required dislike_count: int64 {default := 0};
     required embedding: Embedding;
     multi comments: Comment::Comment;
-    index on ext::pgvector::ivfflat_cosine(lists := 1) on (.embedding);
+    index ext::pgvector::ivfflat_cosine(lists := 1) on (.embedding);
   }
   type Reaction {
     required is_like: bool;
