@@ -1,89 +1,85 @@
-from pydantic import BaseModel, Field
-from libraries.initalizer import db
-
-from queries.user.get_user_by_email_async_edgeql import (GetUserByEmailResult, 
-                                                         GetUserByEmailResultBookmarksItem, 
-                                                         get_user_by_email)
+from queries.posts.search_async_edgeql import search as search_posts
+from queries.user.get_user_by_email_async_edgeql import GetUserByEmailResultBookmarksItem, get_user_by_email
 from queries.user import insert_recommendation, get_users
-
-from queries.post.get_post_async_edgeql import GetPostResult, get_post
+from queries.post.get_post_async_edgeql import get_post
+from pydantic import BaseModel, Field
+from uuid import UUID
+from .initalizer import db, get_data_path
 
 import math
 import numpy as np
 from sklearn.cluster import KMeans
 import asyncio
-from uuid import UUID
 
 class RecommendPostResult(BaseModel):
-    id: UUID = Field(description="The internal ID of the result.")
-    paper_id : str = Field( description="The ID of the recommended paper_id.")
-    similarity_score: float = Field( description="The similarity score of the recommended post." )
+    id: UUID = Field(..., description="The internal ID of the result.")
+    paper_id: str = Field(..., description="The ID of the recommended paper_id.")
+    similarity_score: float = Field(..., description="Cosine similarity (높을수록 유사).")
 
-def cluster_recommendations(emb_matrix: np.ndarray,
-                             paper_ids: list[str],
-                             top_n_per_cluster: int,
-                             max_results: int) -> list[tuple[str, float]]:
-    # 클러스터 개수 계산
-    n_clusters = math.ceil(max_results / top_n_per_cluster)
-    n_clusters = min(n_clusters, emb_matrix.shape[0])
+async def recommend_post_single(
+    user_email: str,
+    top_n_per_cluster: int = 3,
+    max_results: int = 10
+) -> list[RecommendPostResult]: 
+    
+    # 1) 사용자 북마크 로드
+    res = await get_user_by_email(db, email=user_email)
+    if not res or not res.bookmarks:
+        return []
 
-    # 클러스터링 수행
+    bookmarks: list[GetUserByEmailResultBookmarksItem] = res.bookmarks
+    paper_ids = [b.paper_id for b in bookmarks]
+    embeddings = np.vstack([np.array(b.embedding) for b in bookmarks])
+
+    # 2) 클러스터링
+    n_clusters = min(math.ceil(max_results / top_n_per_cluster), embeddings.shape[0])
     kmeans = KMeans(n_clusters=n_clusters)
-    labels = kmeans.fit_predict(emb_matrix)
+    kmeans.fit(embeddings)
     centroids = kmeans.cluster_centers_
 
-    # 각 클러스터에서 중심점에 가장 가까운 top_n_per_cluster개의 포인트 선택
-    results: list[tuple[str, float]] = []
-    for cluster_idx in range(n_clusters):
-        indices = [i for i, lbl in enumerate(labels) if lbl == cluster_idx]
-        dists = [
-            (i, np.linalg.norm(emb_matrix[i] - centroids[cluster_idx]))
-            for i in indices
-        ]
-        dists_sorted = sorted(dists, key=lambda x: x[1])[:top_n_per_cluster]
-        for idx, dist in dists_sorted:
-            results.append((paper_ids[idx], float(dist)))
+    # 3) 각 centroid로 벡터 검색(search) 수행
+    #    중복된 paper_id는 가장 높은 similarity 값으로 유지
+    candidate_map: dict[str, float] = {} # {paper_id :cosine_similarity}
+    for centroid in centroids:
+        results = await search_posts(
+            executor=db,
+            embedding=centroid.tolist(),
+            limit=top_n_per_cluster
+        )
+        for r in results:
+            # 이미 북마크한 포스트는 제외
+            if r.paper_id in paper_ids: continue
+            sim = r.cosine_similarity
 
-    # 전체 결과를 거리 기준으로 정렬한 후 최대 max_results개로 제한
-    results_sorted = sorted(results, key=lambda x: x[1])[:max_results]
-    return results_sorted
+            # 중복된 ID는 더 높은 sim을 유지 (근데 아마 없을거임)
+            if candidate_map.get(r.paper_id, 0) < sim:
+                candidate_map[r.paper_id] = sim
 
+    # 4) similarity 기준으로 정렬 후 max_results개 자르기
+    sorted_candidates = sorted(
+        candidate_map.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:max_results]
 
-# 추천 함수 () -> [추천 Post id]
-# - 유저의 북마크(Post 리스트)를 불러옴
-# - 포스트 안의 임베딩 값을 다 가져옴
-# - 다 가져와서 클러스터링을 때리고
-# - 클러스터 중심점 찍고, 그 값으로 벡터 검색
-# - 그리고 검색된 (post id, 유사도)를 상위 10개만 리턴
-
-async def recommend_post_single(user_email: str, top_n_per_cluster: int = 3, max_results: int = 10) -> list[RecommendPostResult]: 
-    res = await get_user_by_email(db, email=user_email)
-    if res is None:
-        return []
-    bookmarks:list[GetUserByEmailResultBookmarksItem] = res.bookmarks
-    if not bookmarks:
-        return []
-
-    embeddings = [np.array(item.embedding) for item in bookmarks]
-    paper_ids = [item.paper_id for item in bookmarks]
-
-    emb_matrix = np.vstack(embeddings)
-
-    recs = await asyncio.to_thread(
-        cluster_recommendations,
-        emb_matrix,
-        paper_ids,
-        top_n_per_cluster,
-        max_results
-    )
+    # 5) Post 엔티티 조회 & RecommendPostResult 생성
     post_results: list[RecommendPostResult] = []
-    for pid, score in recs:
-        post = await get_post(db, paper_id=pid)
+    for paper_id, sim in sorted_candidates:
+        post = await get_post(db, paper_id=paper_id)
         if post:
-            post_results.append(RecommendPostResult(id=post.id, paper_id=pid, similarity_score=score))
-    _ = await insert_recommendation(db, email=user_email, recommendation=[i.id for i in post_results]) 
-    return post_results
+            post_results.append(
+                RecommendPostResult(
+                    id=post.id,
+                    paper_id=paper_id,
+                    similarity_score=sim
+                )
+            )
 
-async def recommend_post():
-  for i in await get_users(db):
-    _ = await recommend_post_single(i.email)
+    # 6) DB에 추천 기록 저장
+    await insert_recommendation(
+        db,
+        email=user_email,
+        recommendation=[r.id for r in post_results]
+    )
+
+    return post_results
