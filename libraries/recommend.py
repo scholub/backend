@@ -83,3 +83,8 @@ async def recommend_post_single(
     )
 
     return post_results
+
+
+async def recommend_post():
+  for i in await get_users(db):
+    _ = await recommend_post_single(i.email)
